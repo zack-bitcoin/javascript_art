@@ -1,7 +1,25 @@
 
+
+var switch_button = document.getElementById("switchButton");
+var img = document.getElementById("pic");
+var mode = 1;
+switch_button.onclick = function() {
+    console.log("switch button 2 clicked");
+    //var it = img.src;
+    //console.log(it);
+    if (mode == 1) {
+        img.src = "spots2.png";
+        mode = 2;
+    } else if (mode == 2) {
+        img.src = "spots3.png";
+        mode = 3;
+    } else {
+        img.src = "spots.png";
+        mode = 1;
+    }
+};
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
-var img = document.getElementById("pic");
 draw_helper();
 
 function draw_helper(X, Y) {
