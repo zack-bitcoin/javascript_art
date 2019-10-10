@@ -2,7 +2,7 @@
 
 var switch_button = document.getElementById("switchButton");
 var img = document.getElementById("pic");
-var mode = 1;
+var mode = 2;
 switch_button.onclick = function() {
     console.log("switch button 2 clicked");
     //var it = img.src;
