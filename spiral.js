@@ -17,6 +17,7 @@ switch_button.onclick = function() {
         img.src = "spots.png";
         mode = 1;
     }
+    draw_helper(0,0);
 };
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
