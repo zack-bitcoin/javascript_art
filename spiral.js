@@ -21,7 +21,7 @@ switch_button.onclick = function() {
 };
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
-draw_helper();
+draw_helper(0,0);
 
 function draw_helper(X, Y) {
     X = X / 50;
