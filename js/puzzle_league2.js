@@ -12,28 +12,37 @@ var pause_button = document.getElementById("pause_button");
 pause_button.onclick = pause_func;
 var fast_button = document.getElementById("fast_button");
 fast_button.onclick = faster_func;
-
-var frames_per_row = 50;
-var new_row_timer = 40;
-var speed = 1;
-
-var board = empty_board();
-board[9] = generate_row([0,0,0,0,0,0],[0,0,0,0,0,0]);
-board[10] = generate_row([0,0,0,0,0,0],[0,0,0,0,0,0]);
-board[11] = generate_row(board[10],board[9]);
-
-var cursor_location = [3,3];
-
-var points = 0;
 var points_p = document.getElementById("points");
 
-
+var frames_per_row = 50;
 var ManyRows = 12;
 var ManyColumns = 6;
-
 var square_size = 50;
 
+var new_row_timer, speed, board, cursor_location, points, best_move;
 var pause = false;
+var game_over = false;
+
+function new_game() {
+    new_row_timer = 40;
+    speed = 1;
+    board = empty_board();
+    board[9] = generate_row();
+    board[10] = generate_row();
+    board[11] = generate_row();
+    cursor_location = [3,3];
+    points = 0;
+    best_move = 0;
+    pause = false;
+    game_over = false;
+    pause_button.innerHTML = "Pause";
+};
+new_game();
+
+
+
+
+
 
 function empty_board() {
     //12 rows, 6 columns
@@ -58,7 +67,9 @@ function valid_row(a, b, c) {
     };
     return(true);
 };
-function generate_row(a, b) {
+function generate_row() {
+    var a = board[10];
+    var b = board[11];
     var Z = [0,0,0,0,0,0].map(function(x){
         var n = Math.floor(Math.random()*5);
         return(n+1);
@@ -67,7 +78,7 @@ function generate_row(a, b) {
     if (d){
         return(Z);
     };
-    return(generate_row(a, b));
+    return(generate_row());
 }
 
 function match_columns(){
@@ -201,11 +212,13 @@ document.addEventListener('keydown', function(event) {
     if(event.keyCode == 32){//space
         swap(cursor_location[1], cursor_location[0]+1);
     };
-    
+    if(event.keyCode == 82){//r key
+        new_game();
+    };
     console.log(event.keyCode);
 });
 function loc_shifter() {
-    return(Math.max(0, new_row_timer/frames_per_row));
+    return(Math.max(0, new_row_timer/frames_per_row) + 0.3);
 };
 
 function draw_board() {
@@ -232,18 +245,24 @@ function clearscreen(){
 };
 
 function mainloop() {
-    if(!(pause)) {
-        new_row_timer += speed;
+    if(!(pause) && !(game_over)) {
+        //new_row_timer += speed;
         speed *= 1.001;
+        var bool = (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0]));
+        if (bool) {
+            new_row_timer += speed;
+        } else {
+            new_row_timer += (speed/2);
+        }
         if (new_row_timer > frames_per_row) {
-            if (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0])){
-                var new_row = generate_row(board[10], board[11]);
+            if (bool){
+                var new_row = generate_row();
                 board = board.slice(1).concat([new_row]);
                 new_row_timer = 0;
-                cursor_location[1] -= 1;
+                cursor_location[1] = Math.max(0, cursor_location[1] - 1);
             } else {
                 console.log("game over");
-                return 0;
+                game_over = true;
             }
         };
         clearscreen();
@@ -255,9 +274,6 @@ mainloop();
 
 
 function swap(Y, X) {
-    console.log("swap ");
-    console.log(X);
-    console.log(Y);
     var a = board[Y][X-1];
     var b = board[Y][X];
     board[Y][X-1] = b;
@@ -274,7 +290,8 @@ function swap(Y, X) {
     var m = match();
     new_row_timer -= ((frames_per_row) * m / 3);
     points += m;
-    points_p.innerHTML = "point: ".concat(points);
+    best_move = Math.max(best_move, m);
+    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move);
 };
 
 document.addEventListener('click', function(e){
