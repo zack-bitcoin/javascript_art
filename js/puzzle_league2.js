@@ -12,6 +12,8 @@ var pause_button = document.getElementById("pause_button");
 pause_button.onclick = pause_func;
 var fast_button = document.getElementById("fast_button");
 fast_button.onclick = faster_func;
+var restart_button = document.getElementById("restart_button");
+restart_button.onclick = new_game;
 var points_p = document.getElementById("points");
 
 var frames_per_row = 50;
