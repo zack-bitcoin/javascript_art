@@ -22,6 +22,8 @@ board[9] = generate_row([0,0,0,0,0,0],[0,0,0,0,0,0]);
 board[10] = generate_row([0,0,0,0,0,0],[0,0,0,0,0,0]);
 board[11] = generate_row(board[10],board[9]);
 
+var cursor_location = [3,3];
+
 var points = 0;
 var points_p = document.getElementById("points");
 
@@ -181,9 +183,26 @@ document.addEventListener('keydown', function(event) {
     if(event.keyCode == 90){//z key
         faster_func();
     };
-    if(event.keyCode == 32){//space bar
+    if(event.keyCode == 80){//p key
         pause_func();
     };
+    if(event.keyCode == 37){//left
+        cursor_location[0] = Math.max(0, cursor_location[0] - 1);
+    };
+    if(event.keyCode == 38){//up
+        cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+    };
+    if(event.keyCode == 39){//right
+        cursor_location[0] = Math.min(4, cursor_location[0] + 1);
+    };
+    if(event.keyCode == 40){//down
+        cursor_location[1] = Math.min(11, cursor_location[1] + 1);
+    };
+    if(event.keyCode == 32){//space
+        swap(cursor_location[1], cursor_location[0]+1);
+    };
+    
+    console.log(event.keyCode);
 });
 function loc_shifter() {
     return(Math.max(0, new_row_timer/frames_per_row));
@@ -201,6 +220,7 @@ function draw_board() {
             }
         };
     };
+    ctx.drawImage(cursor, square_size*cursor_location[0] - 4, square_size*(cursor_location[1] + 1 - a) - 4);
 };
 
 function clearscreen(){
@@ -220,6 +240,7 @@ function mainloop() {
                 var new_row = generate_row(board[10], board[11]);
                 board = board.slice(1).concat([new_row]);
                 new_row_timer = 0;
+                cursor_location[1] -= 1;
             } else {
                 console.log("game over");
                 return 0;
@@ -234,6 +255,9 @@ mainloop();
 
 
 function swap(Y, X) {
+    console.log("swap ");
+    console.log(X);
+    console.log(Y);
     var a = board[Y][X-1];
     var b = board[Y][X];
     board[Y][X-1] = b;
@@ -247,6 +271,10 @@ function swap(Y, X) {
         gravity2(Y, X);
         gravity2(Y, X-1);
     };
+    var m = match();
+    new_row_timer -= ((frames_per_row) * m / 3);
+    points += m;
+    points_p.innerHTML = "point: ".concat(points);
 };
 
 document.addEventListener('click', function(e){
@@ -264,9 +292,5 @@ document.addEventListener('click', function(e){
     X = Math.min(X, 5);
     X = Math.max(X, 1);
     swap(Y, X);
-    var m = match();
-    new_row_timer -= ((frames_per_row) * m / 3);
-    points += m;
-    points_p.innerHTML = "point: ".concat(points);
 });
 
