@@ -91,4 +91,4 @@ document.addEventListener('click', function(e){
 
 setTimeout(function() {
     draw_board();
-}, 10);
+}, 100);
