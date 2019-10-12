@@ -10,6 +10,8 @@ var green = document.getElementById('green');
 
 var pause_button = document.getElementById("pause_button");
 pause_button.onclick = pause_func;
+var fast_button = document.getElementById("fast_button");
+fast_button.onclick = faster_func;
 
 
 var block_types = [yellow, blue, red, black, green];
@@ -175,9 +177,13 @@ function pause_func() {
         pause_button.innerHTML = "Pause";
     };
 };
+function faster_func() {
+    new_row_timer += frames_per_row;
+};
 document.addEventListener('keydown', function(event) {
     if(event.keyCode == 90){//z key
-        new_row_timer += frames_per_row;
+        faster_func();
+        //new_row_timer += frames_per_row;
     };
     if(event.keyCode == 32){//space bar
         pause_func();
@@ -186,7 +192,7 @@ document.addEventListener('keydown', function(event) {
 });
 
 function draw_board() {
-    var a = new_row_timer/frames_per_row;
+    var a = Math.max(0, new_row_timer/frames_per_row);
     for(columns=0;columns<ManyColumns;columns++){
         for(rows=0;rows<ManyRows;rows++) {
             var x = board[rows][columns];
@@ -260,6 +266,8 @@ document.addEventListener('click', function(e){
     var Y = mouseY - T + (a * square_size);// - (H/2);
     Y = Math.floor((Y / square_size)-1);
     X = Math.floor(0.5 + (X / square_size));
+    X = Math.min(X, 5);
+    X = Math.max(X, 1);
     swap(Y, X);
     var m = match();
     new_row_timer -= ((frames_per_row) * m / 3);
