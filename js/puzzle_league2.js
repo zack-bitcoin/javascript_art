@@ -1,4 +1,3 @@
-
 var c=document.getElementById("myCanvas");
 var ctx=c.getContext("2d");
 var cursor=document.getElementById('cursor');
@@ -7,17 +6,15 @@ var blue = document.getElementById('blue');
 var red = document.getElementById('red');
 var black = document.getElementById('black');
 var green = document.getElementById('green');
+var block_types = [yellow, blue, red, black, green];
 
 var pause_button = document.getElementById("pause_button");
 pause_button.onclick = pause_func;
 var fast_button = document.getElementById("fast_button");
 fast_button.onclick = faster_func;
 
-
-var block_types = [yellow, blue, red, black, green];
-
 var frames_per_row = 50;
-var new_row_timer = 0;
+var new_row_timer = 40;
 var speed = 1;
 
 var board = empty_board();
@@ -183,16 +180,17 @@ function faster_func() {
 document.addEventListener('keydown', function(event) {
     if(event.keyCode == 90){//z key
         faster_func();
-        //new_row_timer += frames_per_row;
     };
     if(event.keyCode == 32){//space bar
         pause_func();
     };
-    //console.log(event.keyCode);
 });
+function loc_shifter() {
+    return(Math.max(0, new_row_timer/frames_per_row));
+};
 
 function draw_board() {
-    var a = Math.max(0, new_row_timer/frames_per_row);
+    var a = loc_shifter();
     for(columns=0;columns<ManyColumns;columns++){
         for(rows=0;rows<ManyRows;rows++) {
             var x = board[rows][columns];
@@ -222,9 +220,7 @@ function mainloop() {
                 var new_row = generate_row(board[10], board[11]);
                 board = board.slice(1).concat([new_row]);
                 new_row_timer = 0;
-                //console.log("new row");
             } else {
-                //console.log(JSON.stringify(board[0]));
                 console.log("game over");
                 return 0;
             }
@@ -247,7 +243,6 @@ function swap(Y, X) {
     } else if(b == 0) {
         gravity(Y-1, X-1);
     }
-
     if((Y+1) < 11) {
         gravity2(Y, X);
         gravity2(Y, X-1);
@@ -262,7 +257,7 @@ document.addEventListener('click', function(e){
     var mouseX = e.pageX;
     var mouseY = e.pageY;
     var X = mouseX - L;// - (W/2);
-    var a = new_row_timer/frames_per_row;
+    var a = loc_shifter();
     var Y = mouseY - T + (a * square_size);// - (H/2);
     Y = Math.floor((Y / square_size)-1);
     X = Math.floor(0.5 + (X / square_size));
