@@ -52,9 +52,17 @@ function click(board){
     if(Keys.mouse){
 	if(!(Keys_responded.mouse)){
 	    Keys_responded.mouse=true;
-	    x=Math.floor(Mouse.x/50-1/2);
-	    a=Math.max(0, 1-(board.counter/(board.speed*3)));
-	    y=Math.floor(12.60-Mouse.y/50-a);
+            var L = myCanvas.offsetLeft;
+            var T = myCanvas.offsetTop;
+            var x = Mouse.x - L;
+            var y = Mouse.y - T;
+	    console.log(L);
+	    console.log(y);
+	    //var x=Math.floor(Mouse.x/50-1/2);
+	    x=Math.floor((x/50)-1/2);
+	    var a=Math.max(0, 1-(board.counter/(board.speed*3)));
+	    //var y=Math.floor(12.60-Mouse.y/50-a);
+	    var y=Math.floor(12.60-(y/50)-a);
 	    //y=Math.floor((-(Mouse.y-550)/50)-a);
 	    console.log(Mouse);
 	    console.log(a);
