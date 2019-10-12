@@ -19,14 +19,17 @@ var corners = [
     make_3_point(-size, size, Z-size),
     make_3_point(-size, -size, Z+size),
     make_3_point(-size, -size, Z-size),
-    make_3_point(size+5, 20, Z),
+    make_3_point(size+5, 20, Z),//8
     make_3_point(size+5, 0, Z + 20),
     make_3_point(size+5, -20, Z),
     make_3_point(size+5, 0, Z - 20),
     make_3_point(size+5, 35, Z),
     make_3_point(size+5, 0, Z + 35),
     make_3_point(size+5, -35, Z),
-    make_3_point(size+5, 0, Z - 35),
+    make_3_point(size+5, 0, Z - 35),//15
+    //make_3_point(0,0,Z+size),
+    make_3_point(0,0,Z),
+    make_3_point(0,0,Z+size+size),//17
 ];
 var colors = [
     "#880000",
@@ -36,10 +39,16 @@ var colors = [
     "#880088",
     "#000088"
 ];
-var faces = [[3,2,0,1],[4,6,7,5],[0,4,5,1],[2,3,7,6],[4,0,2,6],[3,1,5,7]];
-var triangles = faces_to_triangles(faces,colors).concat(
-    [[13,12,14,"#FFFFFF"],[12,15,14,"#FFFFFF"]]).concat(
-        [[9,8,10,"#000000"],[8,11,10,"#000000"]]);
+var purple = "#880088";
+var blue = "#000088";
+var black = "#000000";
+var faces = [[3,2,0,1],[4,6,7,5],[0,4,5,1],[2,3,7,6]];//,[4,0,2,6]];//,[3,1,5,7]];
+var triangles =
+    ([[3,1,16,blue],[1,5,16,black],[5,7,16,blue],[7,3,16,black]]).concat(
+        [[4,0,17,purple],[0,2,17,black],[2,6,17,purple],[6,4,17,black]]).concat(
+        faces_to_triangles(faces,colors)).concat(
+            [[13,12,14,"#FFFFFF"],[12,15,14,"#FFFFFF"]]).concat(
+                [[9,8,10,"#000000"],[8,11,10,"#000000"]]);
 draw_helper();
 function faces_to_triangles(L,C) {
     if (L.length == 0) {

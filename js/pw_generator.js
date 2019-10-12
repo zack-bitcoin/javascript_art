@@ -249,9 +249,9 @@ var wordlist = [
 function entropy_to_passcode(entropy, many) {
     var N = (entropy[0]*256) + entropy[1];
     var N = N % (wordlist.length);
-    console.log(N);
+    //console.log(N);
     var Word = wordlist[N];
-    console.log(Word);
+    //console.log(Word);
     if (many == 1) {
         return Word;
     };
@@ -264,7 +264,7 @@ var ctx = c.getContext("2d");
 var entropyLoaded = 0;
 var entropy = hash([]);
 
-console.log(c.height);
+//console.log(c.height);
 ctx.beginPath();
 ctx.moveTo(5,5);
 ctx.lineTo(5,c.height - 5);
