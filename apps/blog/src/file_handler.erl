@@ -14,6 +14,7 @@ handle(Req, State) ->
     true = case F of
 	       <<"/codecBytes.js">> -> true;
 	       <<"/puzzle_league.js">> -> true;
+	       <<"/puzzle_league2.js">> -> true;
 	       <<"/puzzle_league.html">> -> true;
 	       <<"/black.png">> -> true;
 	       <<"/blue.png">> -> true;
