@@ -6,7 +6,7 @@ var r = identity();
 r = mul_m_m(r, rotate_matrix_3(100,0,0));
 
 //console.log(JSON.stringify(r));
-var dr = [0,0];
+var dr = [0,0,0];
 var W = c.width;
 var Z = W;
 var size = 200;
@@ -18,7 +18,15 @@ var corners = [
     make_3_point(-size, size, Z+size),
     make_3_point(-size, size, Z-size),
     make_3_point(-size, -size, Z+size),
-    make_3_point(-size, -size, Z-size)
+    make_3_point(-size, -size, Z-size),
+    make_3_point(size+5, 20, Z),
+    make_3_point(size+5, 0, Z + 20),
+    make_3_point(size+5, -20, Z),
+    make_3_point(size+5, 0, Z - 20),
+    make_3_point(size+5, 35, Z),
+    make_3_point(size+5, 0, Z + 35),
+    make_3_point(size+5, -35, Z),
+    make_3_point(size+5, 0, Z - 35),
 ];
 var colors = [
     "#880000",
@@ -29,7 +37,9 @@ var colors = [
     "#000088"
 ];
 var faces = [[3,2,0,1],[4,6,7,5],[0,4,5,1],[2,3,7,6],[4,0,2,6],[3,1,5,7]];
-var triangles = faces_to_triangles(faces,colors);
+var triangles = faces_to_triangles(faces,colors).concat(
+    [[13,12,14,"#FFFFFF"],[12,15,14,"#FFFFFF"]]).concat(
+        [[9,8,10,"#000000"],[8,11,10,"#000000"]]);
 draw_helper();
 function faces_to_triangles(L,C) {
     if (L.length == 0) {
@@ -115,20 +125,20 @@ function rotate_matrix_3(a1,a2,a3) {
 };
 function rotation_matrix_x(angle) {
     return([[1,0,0],
-            [0,Math.sin(angle),Math.cos(angle)],
-            [0,Math.cos(angle),-Math.sin(angle)]]);
+            [0,Math.cos(angle),-Math.sin(angle)],
+            [0,Math.sin(angle),Math.cos(angle)]]);
 };
 function rotation_matrix_y(angle) {
     return([
-        [Math.sin(angle),0,Math.cos(angle)],
+        [Math.cos(angle),0,Math.sin(angle)],
         [0,1,0],
-        [Math.cos(angle),0,-Math.sin(angle)]]);
+        [-Math.sin(angle),0,Math.cos(angle)]]);
 };
 function rotation_matrix_z(angle) {
     return([
+        [Math.cos(angle),-Math.sin(angle),0],
         [Math.sin(angle),Math.cos(angle),0],
-        [0,0,1],
-        [Math.cos(angle),-Math.sin(angle),0]]);
+        [0,0,1]]);
 };
 function mul_v_v(v1, v2) {
     if (JSON.stringify(v1) == JSON.stringify([])) {
@@ -153,7 +163,18 @@ function mul_m_m(m1, m2) {
         cs.map(function(x){return(
             mul_v_v(m1[n], x))}))}));
 };
-
+function v_sum(a, b) {
+    if(a.length == 0) {
+        return([]);
+    };
+    return [a[0]+b[0]].concat(v_sum(a.slice(1),b.slice(1)));
+};
+function mul_v_s(V, S) {
+    if(V.length == 0) {
+        return([]);
+    };
+    return [V[0]*S].concat(mul_v_s(V.slice(1), S));
+};
 document.addEventListener('click', function(e){
     //give the cube a little kick depending on which part we click on.
     var L = c.offsetLeft;
@@ -164,14 +185,16 @@ document.addEventListener('click', function(e){
     var mouseY = e.pageY;
     var Y = mouseX - L - (W/2);
     var X = mouseY - T - (H/2);
-    dr = [dr[0] - (X/W/10), dr[1] - (Y/W/10)];
+    var kick = [X, Y, 0];
+    kick = mul_v_s(kick, 1/W/10);
+    dr = v_sum(dr, kick);
 })
 
 cron();
 function cron() {
     setTimeout(function(){
-        dr = [dr[0] * 0.99, dr[1] * 0.99];//reduce spinning with friction.
-        var r2 = rotate_matrix_3(dr[0], 0, dr[1]);//a rotation matrix based on how fast we are spinning
+        dr = [dr[0] * 0.99, dr[1] * 0.99, dr[2] * 0.99];//reduce spinning with friction.
+        var r2 = rotate_matrix_3(dr[0], dr[1], dr[2]);//a rotation matrix based on how fast we are spinning
         r = mul_m_m(r, r2);//use the rotation matrix to calculate our new position
         draw_helper();//draw the cube in it's current position
         return cron();

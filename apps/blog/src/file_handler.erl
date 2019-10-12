@@ -13,6 +13,14 @@ handle(Req, State) ->
     PrivDir = list_to_binary(PrivDir0),
     true = case F of
 	       <<"/codecBytes.js">> -> true;
+	       <<"/puzzle_league.js">> -> true;
+	       <<"/puzzle_league.html">> -> true;
+	       <<"/black.png">> -> true;
+	       <<"/blue.png">> -> true;
+	       <<"/cursor.png">> -> true;
+	       <<"/green.png">> -> true;
+	       <<"/red.png">> -> true;
+	       <<"/yellow.png">> -> true;
 	       <<"/crypto.js">> -> true;
 	       <<"/cube.html">> -> true;
 	       <<"/cube.js">> -> true;
@@ -28,6 +36,14 @@ handle(Req, State) ->
 	       <<"/spots3.png">> -> true;
 	       <<"/spots2.png">> -> true;
 	       <<"/spots.png">> -> true;
+	       <<"/spots.png">> -> true;
+	       <<"/board.html">> -> true;
+	       <<"/board.js">> -> true;
+	       <<"/black_go.png">> -> true;
+	       <<"/white_go.png">> -> true;
+	       <<"/star_go.png">> -> true;
+	       <<"/empty_go.png">> -> true;
+	       <<"/mark_go.png">> -> true;
                X -> 
                    io:fwrite("ext file handler block access to: "),
                    io:fwrite(X),
