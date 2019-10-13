@@ -25,14 +25,16 @@ var new_row_timer, speed, board, cursor_location, points, best_move;
 var pause = false;
 var game_over = false;
 
+
 function new_game() {
     new_row_timer = 40;
     speed = 1;
     board = empty_board();
-    board[9] = generate_row();
-    board[10] = generate_row();
-    board[11] = generate_row();
-    cursor_location = [3,3];
+    cursor_location = [2,12];
+    add_row();
+    add_row();
+    add_row();
+    add_row();
     points = 0;
     best_move = 0;
     pause = false;
@@ -41,15 +43,15 @@ function new_game() {
 };
 new_game();
 
-
-
-
-
-
+function add_row() {
+    var new_row = generate_row();
+    board = board.slice(1).concat([new_row]);
+    new_row_timer = 0;
+    cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+};
 function empty_board() {
-    //12 rows, 6 columns
-    var r = list_many(6, 0);
-    return(list_many(12, r));
+    var r = list_many(6, 0);//columns
+    return(list_many(12, r));//rows
 };
 function list_many(n, r) {
     if(n<1){
@@ -162,11 +164,7 @@ function remove_spot(R, C) {
     return(gravity(R-1, C));
 };
 function remove_from_board(L) {
-    if(L.length == 0){
-        return(0);
-    };
-    remove_spot(L[0][0], L[0][1]);
-    return(remove_from_board(L.slice(1)));
+    L.map(function(x){remove_spot(x[0],x[1])});
 };
 function match() {
     //remove any rows or columns from board that match. apply gravity rules to move blocks downwards, and then attempt to match again, with double points this time.
@@ -177,8 +175,7 @@ function match() {
         return 0;
     };
     remove_from_board(r3);
-    var f = r3.length + (2 * match()) - 2;
-    return(f);
+    return(r3.length - 2 + (2 * match()));
 };
 function pause_func() {
     pause = !(pause);
@@ -192,32 +189,30 @@ function pause_func() {
 function faster_func() {
     new_row_timer += frames_per_row;
 };
+
+var keys = {};
+keys[90] = faster_func;
+keys[80] = pause_func;
+keys[82] = new_game;
+keys[32] = function() {//space bar
+    swap(cursor_location[1], cursor_location[0]+1);
+};
+keys[37] = function(){//left
+    cursor_location[0] = Math.max(0, cursor_location[0] - 1);
+};
+keys[39] = function(){//right
+    cursor_location[0] = Math.min(4, cursor_location[0] + 1);
+};
+keys[38] = function(){//up
+    cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+};
+keys[40] = function(){//down
+    cursor_location[1] = Math.min(11, cursor_location[1] + 1);
+};
 document.addEventListener('keydown', function(event) {
-    if(event.keyCode == 90){//z key
-        faster_func();
-    };
-    if(event.keyCode == 80){//p key
-        pause_func();
-    };
-    if(event.keyCode == 37){//left
-        cursor_location[0] = Math.max(0, cursor_location[0] - 1);
-    };
-    if(event.keyCode == 38){//up
-        cursor_location[1] = Math.max(0, cursor_location[1] - 1);
-    };
-    if(event.keyCode == 39){//right
-        cursor_location[0] = Math.min(4, cursor_location[0] + 1);
-    };
-    if(event.keyCode == 40){//down
-        cursor_location[1] = Math.min(11, cursor_location[1] + 1);
-    };
-    if(event.keyCode == 32){//space
-        swap(cursor_location[1], cursor_location[0]+1);
-    };
-    if(event.keyCode == 82){//r key
-        new_game();
-    };
-    console.log(event.keyCode);
+    //console.log(event.keyCode);
+    var f = keys[event.keyCode];
+    if(!(f == undefined)){ f(); };
 });
 function loc_shifter() {
     return(Math.max(0, new_row_timer/frames_per_row) + 0.3);
@@ -225,17 +220,18 @@ function loc_shifter() {
 
 function draw_board() {
     var a = loc_shifter();
+    var ss = square_size;
     for(columns=0;columns<ManyColumns;columns++){
         for(rows=0;rows<ManyRows;rows++) {
             var x = board[rows][columns];
-            if (x == 0) {
-            } else if (x == undefined) {
-            } else {
-                ctx.drawImage(block_types[x-1], square_size*columns, square_size*(1+rows - a));
+            if ((!(x == 0)) && (!(x == undefined))){
+                ctx.drawImage(block_types[x-1], ss*columns, ss*(1+rows - a));
             }
         };
     };
-    ctx.drawImage(cursor, square_size*cursor_location[0] - 4, square_size*(cursor_location[1] + 1 - a) - 4);
+    var curx = (ss * cursor_location[0]);
+    var cury = (ss * (cursor_location[1] + 1 - a));
+    ctx.drawImage(cursor, curx-4, cury-4);
 };
 
 function clearscreen(){
@@ -254,14 +250,11 @@ function mainloop() {
         if (bool) {
             new_row_timer += speed;
         } else {
-            new_row_timer += (speed/2);
+            new_row_timer += (speed/3);
         }
         if (new_row_timer > frames_per_row) {
             if (bool){
-                var new_row = generate_row();
-                board = board.slice(1).concat([new_row]);
-                new_row_timer = 0;
-                cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+                add_row();
             } else {
                 console.log("game over");
                 game_over = true;
