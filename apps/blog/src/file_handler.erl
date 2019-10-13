@@ -15,6 +15,7 @@ handle(Req, State) ->
 	       <<"/codecBytes.js">> -> true;
 	       <<"/puzzle_league.js">> -> true;
 	       <<"/puzzle_league2.js">> -> true;
+	       <<"/puzzle_league_instructions.html">> -> true;
 	       <<"/puzzle_league.html">> -> true;
 	       <<"/black.png">> -> true;
 	       <<"/blue.png">> -> true;

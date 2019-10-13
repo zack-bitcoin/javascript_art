@@ -1,5 +1,11 @@
+//View, then Model, then Controller
+
+
+//View
+
 var c=document.getElementById("myCanvas");
 var ctx=c.getContext("2d");
+
 var cursor=document.getElementById('cursor');
 var yellow = document.getElementById('yellow');
 var blue = document.getElementById('blue');
@@ -14,21 +20,55 @@ var fast_button = document.getElementById("fast_button");
 fast_button.onclick = add_row;
 var restart_button = document.getElementById("restart_button");
 restart_button.onclick = new_game;
+
 var points_p = document.getElementById("points");
+
+
+function loc_shifter() {
+    return(Math.max(0, new_row_timer/frames_per_row) + 0.3);
+};
+function draw_board() {
+    var a = loc_shifter();
+    var ss = square_size;
+    for(columns=0;columns<ManyColumns;columns++){
+        for(rows=0;rows<ManyRows;rows++) {
+            var x = board[rows][columns];
+            if ((!(x == 0)) && (!(x == undefined))){
+                ctx.drawImage(block_types[x-1], ss*columns, ss*(1+rows - a));
+            }
+        };
+    };
+    var curx = (ss * cursor_location[0]);
+    var cury = (ss * (cursor_location[1] + 1 - a));
+    ctx.drawImage(cursor, curx-4, cury-4);
+};
+function clearscreen(B){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.beginPath();
+    ctx.rect(0,0,c.width,c.height);
+    if (B) {
+        ctx.fillStyle = '#444444';
+    } else {
+        ctx.fillStyle = '#333333';
+    }
+    ctx.fill();
+};
+
+
+//Model
 
 var frames_per_row = 50;
 var ManyRows = 12;
 var ManyColumns = 6;
 var square_size = 50;
-
-var new_row_timer, speed, board, cursor_location, points, best_move;
 var pause = false;
 var game_over = false;
+var new_row_timer, speed, board, cursor_location, points, best_move;
 
 
 function new_game() {
     new_row_timer = 40;
-    speed = 1;
+    speed = 0.5;
     board = empty_board();
     cursor_location = [2,12];
     add_row();
@@ -43,11 +83,18 @@ function new_game() {
 };
 new_game();
 
+function full() {
+    return(!(JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0])));
+};
+
 function add_row() {
-    var new_row = generate_row();
-    board = board.slice(1).concat([new_row]);
-    new_row_timer = Math.min(0, new_row_timer);
-    cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+    var bool = full();
+    if (!bool) {
+        var new_row = generate_row();
+        board = board.slice(1).concat([new_row]);
+        new_row_timer = Math.min(0, new_row_timer);
+        cursor_location[1] = Math.max(0, cursor_location[1] - 1);
+    };
 };
 function empty_board() {
     var r = list_many(6, 0);//columns
@@ -186,64 +233,28 @@ function pause_func() {
         pause_button.innerHTML = "Pause";
     };
 };
-
-var keys = {};
-keys[90] = add_row;
-keys[80] = pause_func;
-keys[82] = new_game;
-keys[32] = function() {//space bar
-    swap(cursor_location[1], cursor_location[0]+1);
-};
-keys[37] = function(){//left
-    cursor_location[0] = Math.max(0, cursor_location[0] - 1);
-};
-keys[39] = function(){//right
-    cursor_location[0] = Math.min(4, cursor_location[0] + 1);
-};
-keys[38] = function(){//up
+function up(){
     cursor_location[1] = Math.max(0, cursor_location[1] - 1);
 };
-keys[40] = function(){//down
+function down(){
     cursor_location[1] = Math.min(11, cursor_location[1] + 1);
 };
-document.addEventListener('keydown', function(event) {
-    //console.log(event.keyCode);
-    var f = keys[event.keyCode];
-    if(!(f == undefined)){ f(); };
-});
-function loc_shifter() {
-    return(Math.max(0, new_row_timer/frames_per_row) + 0.3);
+function right(){
+    cursor_location[0] = Math.min(4, cursor_location[0] + 1);
+};
+function left(){
+    cursor_location[0] = Math.max(0, cursor_location[0] - 1);
 };
 
-function draw_board() {
-    var a = loc_shifter();
-    var ss = square_size;
-    for(columns=0;columns<ManyColumns;columns++){
-        for(rows=0;rows<ManyRows;rows++) {
-            var x = board[rows][columns];
-            if ((!(x == 0)) && (!(x == undefined))){
-                ctx.drawImage(block_types[x-1], ss*columns, ss*(1+rows - a));
-            }
-        };
-    };
-    var curx = (ss * cursor_location[0]);
-    var cury = (ss * (cursor_location[1] + 1 - a));
-    ctx.drawImage(cursor, curx-4, cury-4);
-};
 
-function clearscreen(){
-    ctx.clearRect(0,0,c.width,c.height);
-    ctx.beginPath();
-    ctx.rect(0,0,c.width,c.height);
-    ctx.fillStyle = '#444444';
-    ctx.fill();
-};
 
+var fps = 20;
 function mainloop() {
     if(!(pause) && !(game_over)) {
         //new_row_timer += speed;
-        speed *= 1.001;
-        var bool = (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0]));
+        speed *= 1.00025;
+        var bool = (!(full()));
+        //var bool = (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0]));
         if (bool) {
             new_row_timer += speed;
         } else {
@@ -257,13 +268,12 @@ function mainloop() {
                 game_over = true;
             }
         };
-        clearscreen();
+        clearscreen(bool);
         draw_board();
     };
-    setTimeout(mainloop, 100);//10 frames per second
+    setTimeout(mainloop, 1000/fps);//20 frames per second
 };
 mainloop();
-
 
 function swap(Y, X) {
     var a = board[Y][X-1];
@@ -275,7 +285,7 @@ function swap(Y, X) {
     } else if(b == 0) {
         gravity(Y-1, X-1);
     }
-    if((Y+1) < 11) {
+    if(Y < 11) {
         gravity2(Y, X);
         gravity2(Y, X-1);
     };
@@ -283,8 +293,34 @@ function swap(Y, X) {
     new_row_timer -= ((frames_per_row) * m / 3);
     points += m;
     best_move = Math.max(best_move, m);
-    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move);
+    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move).concat("<br />current speed: ").concat(Math.round(speed*1000));//.concat("<br />time till next row: ").concat((frames_per_row - new_row_timer)/fps/speed);
 };
+
+
+//Controller
+
+var keys = {};
+keys[90] = add_row;//z key
+keys[80] = pause_func;//p key
+keys[82] = new_game;//r key
+keys[32] = function() {//space bar
+    swap(cursor_location[1], cursor_location[0]+1);
+};
+//arrow keys
+keys[37] = left;
+keys[39] = right;
+keys[38] = up;
+keys[40] = down;
+//vi keybindings
+keys[72] = left;
+keys[74] = down;
+keys[75] = up;
+keys[76] = right;
+document.addEventListener('keydown', function(event) {
+    //console.log(event.keyCode);
+    var f = keys[event.keyCode];
+    if(!(f == undefined)){ f(); };
+});
 
 document.addEventListener('click', function(e){
     var L = c.offsetLeft;
@@ -294,9 +330,9 @@ document.addEventListener('click', function(e){
     var mouseX = e.pageX;
     var mouseY = e.pageY;
     if ((mouseX > L) && (mouseX < (L+W)) && (mouseY > T) && (mouseY < (T+H))) {
-        var X = mouseX - L;// - (W/2);
+        var X = mouseX - L;
         var a = loc_shifter();
-        var Y = mouseY - T + (a * square_size);// - (H/2);
+        var Y = mouseY - T + (a * square_size);
         Y = Math.floor((Y / square_size)-1);
         X = Math.floor(0.5 + (X / square_size));
         X = Math.min(X, 5);
