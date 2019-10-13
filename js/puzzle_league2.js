@@ -11,7 +11,7 @@ var block_types = [yellow, blue, red, black, green];
 var pause_button = document.getElementById("pause_button");
 pause_button.onclick = pause_func;
 var fast_button = document.getElementById("fast_button");
-fast_button.onclick = faster_func;
+fast_button.onclick = add_row;
 var restart_button = document.getElementById("restart_button");
 restart_button.onclick = new_game;
 var points_p = document.getElementById("points");
@@ -46,7 +46,7 @@ new_game();
 function add_row() {
     var new_row = generate_row();
     board = board.slice(1).concat([new_row]);
-    new_row_timer = 0;
+    new_row_timer = Math.min(0, new_row_timer);
     cursor_location[1] = Math.max(0, cursor_location[1] - 1);
 };
 function empty_board() {
@@ -186,12 +186,9 @@ function pause_func() {
         pause_button.innerHTML = "Pause";
     };
 };
-function faster_func() {
-    new_row_timer += frames_per_row;
-};
 
 var keys = {};
-keys[90] = faster_func;
+keys[90] = add_row;
 keys[80] = pause_func;
 keys[82] = new_game;
 keys[32] = function() {//space bar
@@ -250,7 +247,7 @@ function mainloop() {
         if (bool) {
             new_row_timer += speed;
         } else {
-            new_row_timer += (speed/3);
+            new_row_timer += (speed/2);
         }
         if (new_row_timer > frames_per_row) {
             if (bool){
@@ -296,13 +293,15 @@ document.addEventListener('click', function(e){
     var H = c.height;
     var mouseX = e.pageX;
     var mouseY = e.pageY;
-    var X = mouseX - L;// - (W/2);
-    var a = loc_shifter();
-    var Y = mouseY - T + (a * square_size);// - (H/2);
-    Y = Math.floor((Y / square_size)-1);
-    X = Math.floor(0.5 + (X / square_size));
-    X = Math.min(X, 5);
-    X = Math.max(X, 1);
-    swap(Y, X);
+    if ((mouseX > L) && (mouseX < (L+W)) && (mouseY > T) && (mouseY < (T+H))) {
+        var X = mouseX - L;// - (W/2);
+        var a = loc_shifter();
+        var Y = mouseY - T + (a * square_size);// - (H/2);
+        Y = Math.floor((Y / square_size)-1);
+        X = Math.floor(0.5 + (X / square_size));
+        X = Math.min(X, 5);
+        X = Math.max(X, 1);
+        swap(Y, X);
+    };
 });
 
