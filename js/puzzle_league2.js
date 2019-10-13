@@ -25,7 +25,7 @@ var points_p = document.getElementById("points");
 
 
 function loc_shifter() {
-    return(Math.max(0, new_row_timer/frames_per_row) + 0.3);
+    return(Math.max(0, new_row_timer/frames_per_row) + 0.5);
 };
 function draw_board() {
     var a = loc_shifter();
@@ -41,6 +41,7 @@ function draw_board() {
     var curx = (ss * cursor_location[0]);
     var cury = (ss * (cursor_location[1] + 1 - a));
     ctx.drawImage(cursor, curx-4, cury-4);
+    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move).concat("<br />current speed: ").concat(Math.round(speed*1000)).concat("<br />time till next row: ").concat(Math.round((frames_per_row - new_row_timer)/fps/speed));
 };
 function clearscreen(B){
     ctx.clearRect(0,0,c.width,c.height);
@@ -293,9 +294,7 @@ function swap(Y, X) {
     new_row_timer -= ((frames_per_row) * m / 3);
     points += m;
     best_move = Math.max(best_move, m);
-    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move).concat("<br />current speed: ").concat(Math.round(speed*1000));//.concat("<br />time till next row: ").concat((frames_per_row - new_row_timer)/fps/speed);
 };
-
 
 //Controller
 
