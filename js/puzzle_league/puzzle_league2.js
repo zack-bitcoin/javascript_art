@@ -41,7 +41,7 @@ function draw_board() {
     var curx = (ss * cursor_location[0]);
     var cury = (ss * (cursor_location[1] + 1 - a));
     ctx.drawImage(cursor, curx-4, cury-4);
-    points_p.innerHTML = "point: ".concat(points).concat("<br />best move: ").concat(best_move).concat("<br />current speed: ").concat(Math.round(speed*1000)).concat("<br />time till next row: ").concat(Math.round((frames_per_row - new_row_timer)/fps/speed));
+    points_p.innerHTML = "point: ".concat(points).concat(" | best move: ").concat(best_move).concat(" | current speed: ").concat(Math.round(speed*1000)).concat("<br />time till next row: ").concat(Math.round((frames_per_row - new_row_timer)/fps/speed)).concat(" | time: ").concat(Math.round(game_time));
 };
 function clearscreen(B){
     ctx.clearRect(0,0,c.width,c.height);
@@ -64,10 +64,11 @@ var ManyColumns = 6;
 var square_size = 50;
 var pause = false;
 var game_over = false;
-var new_row_timer, speed, board, cursor_location, points, best_move;
+var new_row_timer, speed, board, cursor_location, points, best_move, game_time;
 
 
 function new_game() {
+    game_time = 0;
     new_row_timer = 40;
     speed = 0.5;
     board = empty_board();
@@ -90,7 +91,7 @@ function full() {
 
 function add_row() {
     var bool = full();
-    if (!bool) {
+    if ((!bool) && (!pause)) {
         var new_row = generate_row();
         board = board.slice(1).concat([new_row]);
         new_row_timer = Math.min(0, new_row_timer);
@@ -123,7 +124,7 @@ function generate_row() {
     var a = board[10];
     var b = board[11];
     var Z = [0,0,0,0,0,0].map(function(x){
-        var n = Math.floor(Math.random()*5);
+        var n = Math.floor(Math.random()*(block_types.length));
         return(n+1);
     });
     var d = valid_row(Z, a, b);
@@ -253,6 +254,7 @@ var fps = 20;
 function mainloop() {
     if(!(pause) && !(game_over)) {
         //new_row_timer += speed;
+        game_time += (1 / fps);
         speed *= 1.00025;
         var bool = (!(full()));
         //var bool = (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0]));

@@ -8,49 +8,53 @@
 init(Req, Opts) ->
 	handle(Req, Opts).
 handle(Req, State) ->
-    F = cowboy_req:path(Req),
+    F0 = cowboy_req:path(Req),
     PrivDir0 = "../../../../js",
     PrivDir = list_to_binary(PrivDir0),
-    true = case F of
-	       <<"/codecBytes.js">> -> true;
-	       <<"/puzzle_league.js">> -> true;
-	       <<"/puzzle_league2.js">> -> true;
-	       <<"/puzzle_league_instructions.html">> -> true;
-	       <<"/puzzle_league.html">> -> true;
-	       <<"/black.png">> -> true;
-	       <<"/blue.png">> -> true;
-	       <<"/cursor.png">> -> true;
-	       <<"/green.png">> -> true;
-	       <<"/red.png">> -> true;
-	       <<"/yellow.png">> -> true;
-	       <<"/crypto.js">> -> true;
-	       <<"/cube.html">> -> true;
-	       <<"/cube.js">> -> true;
-	       <<"/format.js">> -> true;
-	       <<"/main.html">> -> true;
-	       <<"/password.html">> -> true;
-	       <<"/pw_generator.js">> -> true;
-	       <<"/favicon.ico">> -> true;
-	       <<"/sjcl.js">> -> true;
-	       <<"/spiral.html">> -> true;
-	       <<"/spiral.js">> -> true;
-	       <<"/signing.js">> -> true;
-	       <<"/spots3.png">> -> true;
-	       <<"/spots2.png">> -> true;
-	       <<"/spots.png">> -> true;
-	       <<"/spots.png">> -> true;
-	       <<"/board.html">> -> true;
-	       <<"/board.js">> -> true;
-	       <<"/black_go.png">> -> true;
-	       <<"/white_go.png">> -> true;
-	       <<"/star_go.png">> -> true;
-	       <<"/empty_go.png">> -> true;
-	       <<"/mark_go.png">> -> true;
+    F = case F0 of
+	       <<"/codecBytes.js">> -> F0;
+	       <<"/puzzle_league.js">> -> F0;
+	       <<"/puzzle_league/puzzle_league2.js">> -> F0;
+	       <<"/puzzle_league/instructions.html">> -> F0;
+	       <<"/puzzle_league/main.html">> -> F0;
+
+	       <<"/puzzle_league/black.png">> -> F0;
+	       <<"/puzzle_league/blue.png">> -> F0;
+	       <<"/puzzle_league/cursor.png">> -> F0;
+	       <<"/puzzle_league/green.png">> -> F0;
+	       <<"/puzzle_league/yellow.png">> -> F0;
+	       <<"/puzzle_league/red.png">> -> F0;
+
+	       <<"/crypto.js">> -> F0;
+	       <<"/cube.html">> -> F0;
+	       <<"/cube.js">> -> F0;
+	       <<"/room.html">> -> F0;
+	       <<"/room.js">> -> F0;
+	       <<"/format.js">> -> F0;
+	       <<"/main.html">> -> F0;
+	       <<"/password.html">> -> F0;
+	       <<"/pw_generator.js">> -> F0;
+	       <<"/favicon.ico">> -> F0;
+	       <<"/sjcl.js">> -> F0;
+	       <<"/spiral.html">> -> F0;
+	       <<"/spiral.js">> -> F0;
+	       <<"/signing.js">> -> F0;
+	       <<"/spots3.png">> -> F0;
+	       <<"/spots2.png">> -> F0;
+	       <<"/spots.png">> -> F0;
+	       <<"/spots.png">> -> F0;
+	       <<"/board.html">> -> F0;
+	       <<"/board.js">> -> F0;
+	       <<"/black_go.png">> -> F0;
+	       <<"/white_go.png">> -> F0;
+	       <<"/star_go.png">> -> F0;
+	       <<"/empty_go.png">> -> F0;
+	       <<"/mark_go.png">> -> F0;
                X -> 
-                   io:fwrite("ext file handler block access to: "),
-                   io:fwrite(X),
-                   io:fwrite("\n"),
-                   false
+                io:fwrite("ext file handler block access to: "),
+                io:fwrite(X),
+                io:fwrite("\n"),
+                <<"/main.html">>
            end,
     %File = << PrivDir/binary, <<"/external_web">>/binary, F/binary>>,
     File = << PrivDir/binary, F/binary>>,
