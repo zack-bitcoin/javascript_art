@@ -30,6 +30,8 @@ handle(Req, State) ->
 	       <<"/cube.js">> -> F0;
 	       <<"/room.html">> -> F0;
 	       <<"/room.js">> -> F0;
+	       <<"/plant.html">> -> F0;
+	       <<"/plant.js">> -> F0;
 	       <<"/format.js">> -> F0;
 	       <<"/main.html">> -> F0;
 	       <<"/password.html">> -> F0;

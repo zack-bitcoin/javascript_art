@@ -1,8 +1,6 @@
 //View, then Model, then Controller
 
-
 //View
-
 var c=document.getElementById("myCanvas");
 var ctx=c.getContext("2d");
 
@@ -22,7 +20,6 @@ var restart_button = document.getElementById("restart_button");
 restart_button.onclick = new_game;
 
 var points_p = document.getElementById("points");
-
 
 function loc_shifter() {
     return(Math.max(0, new_row_timer/frames_per_row) + 0.5);
@@ -229,7 +226,7 @@ function match() {
 function pause_func() {
     pause = !(pause);
     if(pause){
-        clearscreen();
+        clearscreen(false);
         pause_button.innerHTML = "Resume";
     } else {
         pause_button.innerHTML = "Pause";
@@ -248,21 +245,17 @@ function left(){
     cursor_location[0] = Math.max(0, cursor_location[0] - 1);
 };
 
-
-
 var fps = 20;
 function mainloop() {
     if(!(pause) && !(game_over)) {
-        //new_row_timer += speed;
         game_time += (1 / fps);
         speed *= 1.00025;
         var bool = (!(full()));
-        //var bool = (JSON.stringify(board[0]) == JSON.stringify([0,0,0,0,0,0]));
-        if (bool) {
+        if (bool || (new_row_timer < (-speed))) {
             new_row_timer += speed;
         } else {
             new_row_timer += (speed/2);
-        }
+        };
         if (new_row_timer > frames_per_row) {
             if (bool){
                 add_row();
@@ -274,7 +267,7 @@ function mainloop() {
         clearscreen(bool);
         draw_board();
     };
-    setTimeout(mainloop, 1000/fps);//20 frames per second
+    setTimeout(mainloop, 1000/fps);
 };
 mainloop();
 
