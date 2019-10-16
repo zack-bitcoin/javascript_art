@@ -3,7 +3,7 @@ var ctx = c.getContext("2d");
 var perspective = {x:0,z:500,theta:0};
 var controls = {37:false, 38:false, 39:false, 40:false, 65:false, 83:false};
 
-var fps = 50;
+var fps = 20;
 var mapSize = 1600;
 var vision = mapSize - 200;
 var colors = ["#880000",//red
@@ -23,9 +23,17 @@ var triangles =
             grove(pdb, kelp, 0, mapSize, 10, 10, 0, mapSize, 0.1, 0.1, 50)).concat(
                 grove(pdb, daisy, 0, mapSize, 20, 0, 0, mapSize, 1, 0.1, 100)).concat(
                     grove(pdb, redwood, 0, mapSize, -40, 10, 0, mapSize, 5, 0, 10));
-
-cron();
+var spider_loc = pdb.add(10,0,10);
+setTimeout(function(){
+    cron();
+}, 300);
 function cron(){
+    var sp = pdb.db[spider_loc];
+    var T = perspective.theta;
+    sp.x = ((sp.x * 19) + (perspective.x - (100 * Math.sin(T)) + (mapSize / 2))) / 20;
+    sp.z = ((sp.z * 19) + (perspective.z + (100 * Math.cos(T)) + (mapSize / 2))) / 20;
+    console.log(JSON.stringify(sp));
+    console.log(JSON.stringify(perspective));
     movement([37,38,39,40,65,83]);
     var pdb2 = pdb.perspective();
     draw_helper(pdb2, triangles);
@@ -42,6 +50,9 @@ function movement(L){
 
 function make_3_point(a, b, c) {
     return {x: a, y: b, z: c};
+}
+function make_2_point(a, b) {
+    return {x: a, y: b};
 }
 function pos_mod(A, B) {
     return(((A % B) + B) % B);
@@ -173,14 +184,17 @@ function draw_triangle(p1, p2, p3, color) {
         ctx.fill();
     }
 }
+function visible(Z) {
+    return ((Z.z > 0) && (Z.z < vision) && (Z.x > -(vision/2)) && (Z.x < (vision/2)));
+};
 function draw_triangles(corners, Tris) {
     for(i=0;i<Tris.length;i++){
         var tri = Tris[i];
         var P0 = corners[tri[0]];
         var P1 = corners[tri[1]];
         var P2 = corners[tri[2]];
-        var f = function(Z) {return ((Z.z > 0) && (Z.z < vision) && (Z.x > -(vision/2)) && (Z.x < (vision/2)));};
-        if(f(P0) && f(P1) && f(P2)) {
+        //var f = function(Z) {return ((Z.z > 0) && (Z.z < vision) && (Z.x > -(vision/2)) && (Z.x < (vision/2)));};
+        if(visible(P0) && visible(P1) && visible(P2)) {
             //if ((P0.z > 0) && (P1.z > 0) && (P2.z > 0)) {
             var p1 = three_to_two(P0);
             var p2 = three_to_two(P1);
@@ -189,15 +203,41 @@ function draw_triangles(corners, Tris) {
         }
     };
 };
+var spider = document.getElementById('spider');
+function draw_background() {
+    var W = c.width;
+    var H = c.height;
+    var pts = [[0,0],[W,0],
+               [0,H/2],[W,H/2],
+               [0,H],[W,H]];
+    var pts = pts.map(function(x){return(make_2_point(x[0],x[1]));});
+    var cs = [colors[3],colors[6]];
+    draw_triangle(pts[0],pts[1], pts[2],cs[0]);
+    draw_triangle(pts[0],pts[1], pts[3],cs[0]);
+    draw_triangle(pts[1],pts[3], pts[2],cs[0]);
+    draw_triangle(pts[4],pts[2], pts[3],cs[1]);
+    draw_triangle(pts[4],pts[3], pts[5],cs[1]);
+};
 function perspective_distance(points, triangle) {
     var p0 = points[triangle[0]];
     return(p0.z);
 };
+    
 function draw_helper(points2, tris) {
     var f = function(x) {return(perspective_distance(points2, x));};
     var triangles2 = tris.sort(function(t1, t2){return(f(t2) - f(t1))});
     ctx.clearRect(0, 0, c.width, c.height);
-    return draw_triangles(points2, triangles2);
+    draw_background();
+    draw_triangles(points2, triangles2);
+    //console.log(points2[spider_loc]);
+    var sp1 = points2[spider_loc];
+    if(visible(sp1)){
+        var X = sp1.x;
+        var Z = sp1.z;
+        var d = Math.sqrt((X*X) + (Z*Z));
+        var sp2 = three_to_two(sp1);
+        ctx.drawImage(spider, sp2.x, sp2.y, 27000/d, 20000/d);
+    };
 };
 function three_to_two(a) {
     var W = c.width;

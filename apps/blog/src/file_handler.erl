@@ -32,6 +32,7 @@ handle(Req, State) ->
 	       <<"/room.js">> -> F0;
 	       <<"/plant.html">> -> F0;
 	       <<"/plant.js">> -> F0;
+	       <<"/spider.png">> -> F0;
 	       <<"/format.js">> -> F0;
 	       <<"/main.html">> -> F0;
 	       <<"/password.html">> -> F0;

@@ -33,7 +33,7 @@ function draw_helper(X, Y) {
     ctx.clearRect(0, 0, c.width, c.height);
     //ctx.drawImage(img, 10, 10, 1000, 800);
     ctx.drawImage(img, X-(Y), Y+(X*1.5), 1000, 800);
-   ctx.rotate(Math.PI/100);
+    ctx.rotate(Math.PI/100);
     ctx.drawImage(img, 0, 0, 1020, 820);
     ctx.rotate(-Math.PI/100);
 }; 
