@@ -3,7 +3,7 @@ var ctx = c.getContext("2d");
 var perspective = {x:0,z:500,theta:0};
 var controls = {37:false, 38:false, 39:false, 40:false, 65:false, 83:false};
 
-var fps = 20;
+var fps = 40;
 var mapSize = 1600;
 var vision = mapSize - 200;
 var colors = ["#880000",//red
@@ -29,11 +29,10 @@ setTimeout(function(){
 }, 300);
 function cron(){
     var sp = pdb.db[spider_loc];
-    var T = perspective.theta;
-    sp.x = ((sp.x * 19) + (perspective.x - (100 * Math.sin(T)) + (mapSize / 2))) / 20;
-    sp.z = ((sp.z * 19) + (perspective.z + (100 * Math.cos(T)) + (mapSize / 2))) / 20;
-    console.log(JSON.stringify(sp));
-    console.log(JSON.stringify(perspective));
+    var T = perspective.theta + 0.2;
+    var sd = 60;
+    sp.x = ((sp.x * 19) + (perspective.x - (sd * Math.sin(T)) + (mapSize / 2))) / 20;
+    sp.z = ((sp.z * 19) + (perspective.z + (sd * Math.cos(T)) + (mapSize / 2))) / 20;
     movement([37,38,39,40,65,83]);
     var pdb2 = pdb.perspective();
     draw_helper(pdb2, triangles);
@@ -140,7 +139,7 @@ function pine(db, x, y, z, size) {
     return(make_plant(db, x, y, z, size*10, size*20, 15, 7/8, colors[2]));
 };
 function coral(db, x, y, z, size) {
-    return(make_plant(db, x, y, z, size*20, size*5, 4, 4/5, colors[4]));
+    return(make_plant(db, x, y, z, size*20, size*5, 4, 4/5, colors[1]));
 };
 function kelp(db, x, y, z, size) {
     return(make_plant(db, x, y, z, size*20, size*20, 20, 1, colors[5]));
@@ -211,7 +210,7 @@ function draw_background() {
                [0,H/2],[W,H/2],
                [0,H],[W,H]];
     var pts = pts.map(function(x){return(make_2_point(x[0],x[1]));});
-    var cs = [colors[3],colors[6]];
+    var cs = [colors[1],colors[6]];
     draw_triangle(pts[0],pts[1], pts[2],cs[0]);
     draw_triangle(pts[0],pts[1], pts[3],cs[0]);
     draw_triangle(pts[1],pts[3], pts[2],cs[0]);
