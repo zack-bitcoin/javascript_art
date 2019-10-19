@@ -71,8 +71,6 @@ function three_to_two(a) {
     return {x: X, y: Y};
 }
 var v1 = pdb.add(0,0,500);
-console.log(v1);
-console.log(pdb.db[v1]);
 var v2 = pdb.add(100,0,400);
 var v3 = pdb.add(0,0,700);
 var v4 = pdb.add(0,-200,500);
@@ -117,7 +115,7 @@ function draw_helper() {
     var detail = 60;
     var db = pdb.perspective();
     //things = things.sort(function(a,b){return(db[b.point].z - db[a.point].z);});
-    things = things.sort(function(a,b){return(distance_to(db[b.point]) - distance_to(db[a.point]));});
+    things = things.sort(function(a,b){return(distance_to(db[a.point]) - distance_to(db[b.point]));});
     for(var x = 0; x<detail; x++) {
         for(var y = 0; y<detail; y++){
             for(var i=0; i<things.length; i++){
@@ -125,6 +123,7 @@ function draw_helper() {
                 var L = line_maker(p, d);
                 var T = things[i];
                 if((visible(db[T.point])) && T.where(L, db)){
+                    i=things.length;
                     vision_points = vision_points.concat([[d, i, T.color]]);
                 };
             };
