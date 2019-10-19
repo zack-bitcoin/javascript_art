@@ -18,23 +18,19 @@ function minus_3(a, b) {
             z: a.z - b.z});
 };
 function normalize(v) {
-    //var d = Math.sqrt((v.x**2) + (v.y**2) + (v.z**2));
     var d = distance_to(v);
     return({x: v.x / d, y: v.y / d, z: v.z / d});
 };
-function line_maker(location, direction) {
-    //location is where you are located.
-    // direction is a point in the diretion being observed.
+function vector_maker(location, direction) {
     var d2 = minus_3(direction, location);
-    var d = normalize(d2);
-    return({loc: location, direction: d});
+    return(normalize(d2));
 };
 function cube(sidelength, corner) {
     var W = c.width;
     var corner2 = corner;
-    return(function(line, db){
+    return(function(vector, db){
         var corner = db[corner2];
-        var d = three_to_two(line.direction);
+        var d = three_to_two(vector);
         var c2 = three_to_two(corner);
         var sidelength2 = sidelength * W / corner.z;
         return((d.x < c2.x+sidelength2) &&
@@ -46,9 +42,9 @@ function cube(sidelength, corner) {
 function sphere(radius, center) {
     var W = c.width;
     var center2 = center;
-    return(function(line, db) {
+    return(function(vector, db) {
         var center = db[center2];
-        var d = three_to_two(line.direction);
+        var d = three_to_two(vector);
         var c2 = three_to_two(center);
         var r2 = radius * W / center.z;
         return((r2**2) > ((d.x - c2.x)**2 + (d.y - c2.y)**2));
@@ -83,9 +79,9 @@ var things = [
     sphere_thing(v2, 60, colors[2]),
     sphere_thing(v3, 100, colors[4]),
     sphere_thing(v4, 100, colors[3]),
-    {where: cube(100, v5),
-     point: v5,
-     color: colors[1]},
+    //{where: cube(100, v5),
+    // point: v5,
+    // color: colors[1]},
     sphere_thing(v6, 20, colors[5]),
     sphere_thing(v7, 9800, colors[6]),
     sphere_thing(v8, 10000, colors[7]),
@@ -112,20 +108,20 @@ function distance_to(v) {
 function draw_helper() {
     var p = make_3_point(0,0,0);
     //var detail = 40;
-    var pixel_width = 20;
+    var pixel_width = 10;
     var db = pdb.perspective();
     things = things.sort(function(a,b){return(distance_to(db[a.point]) - distance_to(db[b.point]));});
     var wide = c.width / pixel_width;
     var tall = c.height / pixel_width;
     for(var x = 0; x<wide; x++) {
         for(var y = 0; y<tall; y++){
-            var color = "#FFFFFF";
+            var color = "#FFFFFF";//default pixel color is white.
             var d = make_3_point(x-(wide/2),y-(tall/2),wide);
-            var L = line_maker(p, d);
+            var V = vector_maker(p, d);
             for(var i=0; i<things.length; i++){
                 var T = things[i];
                 if(visible(db[T.point])) {
-                    if(T.where(L, db)){
+                    if(T.where(V, db)){
                         color = T.color;
                         i=things.length;
                     };
