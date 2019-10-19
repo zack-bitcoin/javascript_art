@@ -34,6 +34,8 @@ handle(Req, State) ->
 	       <<"/plant.js">> -> F0;
 	       <<"/orbits.html">> -> F0;
 	       <<"/orbits.js">> -> F0;
+	       <<"/vision.html">> -> F0;
+	       <<"/vision.js">> -> F0;
 	       <<"/spider.png">> -> F0;
 	       <<"/format.js">> -> F0;
 	       <<"/main.html">> -> F0;
