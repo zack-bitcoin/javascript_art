@@ -103,7 +103,7 @@ var things = [
     // color: colors[1]},
     sphere_thing(v6, 20, colors[5]),
     sphere_thing(v7,10000, colors[6]),
-    sphere_thing(v8, 5000, colors[7]),
+    sphere_thing(v8, 5000, colors[1]),
     sphere_thing(v9, 450, colors[8]),
 ];
 function sphere_thing(point, radius, color){
@@ -127,7 +127,7 @@ function distance_to(v) {
 };
 function draw_helper() {
     var p = make_3_point(0,0,0);
-    var pixel_width = 15;
+    var pixel_width = 10;
     var db = pdb.perspective();
     things = things.sort(function(a,b){return(distance_to(db[a.point]) - distance_to(db[b.point]));});
     var wide = c.width / pixel_width;
@@ -135,9 +135,9 @@ function draw_helper() {
     for(var x = 0; x<wide; x++) {
         for(var y = 0; y<tall; y++){
             var color = "#FFFFFF";//default pixel color is white.
-            var fun = function(x, w) {
-                return(w * Math.sin(((x/w) - 0.5)*Math.PI) / Math.PI);
-            }
+            //var fun = function(x, w) {
+            //    return(w * Math.sin(((x/w) - 0.5)*Math.PI) / Math.PI);
+            //}
             //console.log(x-(wide/2));
             //console.log(fun(x, wide));
             //console.log(y-(tall/2));
@@ -146,10 +146,14 @@ function draw_helper() {
             //var d = make_3_point(fun(x, wide), fun(y, tall), wide);
             var X = x-(wide/2);
             var Y = y-(tall/2);
-            var zed = Math.sqrt(wide**2 - X**2 - Y**2);
-            var mode = 1;//2 is telescope, 1/2 is fish-eye
-            var d = make_3_point(x-(wide/2),y-(tall/2),zed*mode);
-            //var d2 = make_3_point(x-(wide/2),y-(tall/2),wide);
+            var Z = Math.sqrt(wide**2 - X**2 - Y**2);
+            X = wide * Math.sin(X*Math.PI/wide/3);
+            Y = tall * Math.sin(Y*Math.PI/tall/3);
+            //screen is measuring pi/36 staradians.
+            var zed = Math.sqrt((wide*2)**2 - X**2 - Y**2);
+            var d = make_3_point(X, Y, zed);
+            //var d = make_3_point(x-(wide/2),y-(tall/2),zed);
+            var d2 = make_3_point(x-(wide/2),y-(tall/2),Z);
             var V = vector_maker(p, d);
             for(var i=0; i<things.length; i++){
                 var T = things[i];
@@ -160,10 +164,10 @@ function draw_helper() {
                     };
                 };
             };
-            var p1 = three_to_two2(d);
+            var p1 = three_to_two2(d2);
             //var p1 = three_to_two(d2);
             //console.log(JSON.stringify([p1, p10]));
-            var size = pixel_width*1 ;
+            var size = pixel_width ;
             var p2 = {y: p1.y, x: p1.x + size};
             var p3 = {y: p1.y + size, x: p1.x};
             var p4 = {y: p1.y + size, x: p1.x + size};
@@ -220,8 +224,8 @@ function pdb_maker() {
 
 var controls = {37:false, 38:false, 39:false, 40:false, 65:false, 83:false};
 var perspective = {x:0,z:0,theta:0};
-var step_size = 10;
-var turn_speed = 0.02;
+var step_size = 20;
+var turn_speed = 0.03;
 function left() {
     perspective.theta += turn_speed;
 };
