@@ -18,7 +18,8 @@ function minus_3(a, b) {
             z: a.z - b.z});
 };
 function normalize(v) {
-    var d = Math.sqrt((v.x**2) + (v.y**2) + (v.z**2));
+    //var d = Math.sqrt((v.x**2) + (v.y**2) + (v.z**2));
+    var d = distance_to(v);
     return({x: v.x / d, y: v.y / d, z: v.z / d});
 };
 function line_maker(location, direction) {
@@ -76,6 +77,9 @@ var v2 = pdb.add(100,0,400);
 var v3 = pdb.add(0,0,700);
 var v4 = pdb.add(0,-200,500);
 var v5 = pdb.add(0,0,300);
+var v6 = pdb.add(-200,10,500);
+var v7 = pdb.add(-200,10000,500);
+var v8 = pdb.add(0,0,12000);
 var things = [
     sphere_thing(v1, 80, colors[0]),
     sphere_thing(v2, 60, colors[2]),
@@ -84,6 +88,9 @@ var things = [
     {where: cube(100, v5),
      point: v5,
      color: colors[1]},
+    sphere_thing(v6, 20, colors[5]),
+    sphere_thing(v7, 9800, colors[6]),
+    sphere_thing(v8, 10000, colors[7]),
 ];
 function sphere_thing(point, radius, color){
     return({where: sphere(radius, point),
@@ -101,12 +108,16 @@ setTimeout(function(){
     return(cron());
 }, 100);
 //draw_helper();
+function distance_to(v) {
+    return(Math.sqrt((v.x**2) + (v.y**2) + (v.z**2)));
+};
 function draw_helper() {
     var p = make_3_point(0,0,0);
     var vision_points = [];
     var detail = 60;
     var db = pdb.perspective();
-    things = things.sort(function(a,b){return(db[b.point].z - db[a.point].z);});
+    //things = things.sort(function(a,b){return(db[b.point].z - db[a.point].z);});
+    things = things.sort(function(a,b){return(distance_to(db[b.point]) - distance_to(db[a.point]));});
     for(var x = 0; x<detail; x++) {
         for(var y = 0; y<detail; y++){
             for(var i=0; i<things.length; i++){
@@ -146,7 +157,7 @@ function draw_square(p1, p2, p3, p4, color) {
     }
 }
 function visible(Z) {
-    var vision = 10000;
+    var vision = 100000;
     return ((Z.z > 0) && (Z.z < vision) && (Z.x > -(vision/2)) && (Z.x < (vision/2)));
 };
 function pdb_maker() {
@@ -178,7 +189,7 @@ function pdb_maker() {
 
 var controls = {37:false, 38:false, 39:false, 40:false, 65:false, 83:false};
 var perspective = {x:0,z:0,theta:0};
-var step_size = 20;
+var step_size = 10;
 var turn_speed = 0.02;
 function left() {
     perspective.theta += turn_speed;
