@@ -111,49 +111,43 @@ function distance_to(v) {
 };
 function draw_helper() {
     var p = make_3_point(0,0,0);
-    var vision_points = [];
-    var detail = 60;
+    //var detail = 40;
+    var pixel_width = 20;
     var db = pdb.perspective();
-    //things = things.sort(function(a,b){return(db[b.point].z - db[a.point].z);});
     things = things.sort(function(a,b){return(distance_to(db[a.point]) - distance_to(db[b.point]));});
-    for(var x = 0; x<detail; x++) {
-        for(var y = 0; y<detail; y++){
+    var wide = c.width / pixel_width;
+    var tall = c.height / pixel_width;
+    for(var x = 0; x<wide; x++) {
+        for(var y = 0; y<tall; y++){
+            var color = "#FFFFFF";
+            var d = make_3_point(x-(wide/2),y-(tall/2),wide);
+            var L = line_maker(p, d);
             for(var i=0; i<things.length; i++){
-                var d = make_3_point(x-(detail/2),y-(detail/2),detail);
-                var L = line_maker(p, d);
                 var T = things[i];
-                if((visible(db[T.point])) && T.where(L, db)){
-                    i=things.length;
-                    vision_points = vision_points.concat([[d, i, T.color]]);
+                if(visible(db[T.point])) {
+                    if(T.where(L, db)){
+                        color = T.color;
+                        i=things.length;
+                    };
                 };
             };
+            var p1 = three_to_two(d);
+            var size = pixel_width ;
+            var p2 = {y: p1.y, x: p1.x + size};
+            var p3 = {y: p1.y + size, x: p1.x};
+            var p4 = {y: p1.y + size, x: p1.x + size};
+            draw_square(p1, p2, p4, p3, color);
         };
     };
-    //console.log(JSON.stringify(vision_points));
-    ctx.clearRect(0, 0, c.width, c.height);
-    for(var i=0; i<vision_points.length; i++){
-        var vp = vision_points[i];
-        var p1 = three_to_two(vp[0]);
-        var size = 17;
-        var p2 = {y: p1.y, x: p1.x + size};
-        var p3 = {y: p1.y + size, x: p1.x};
-        var p4 = {y: p1.y + size, x: p1.x + size};
-        draw_square(p1, p2, p4, p3, vp[2]);
-        //draw_triangle(p4, p2, p3, vp[2]);
-    };
-    //console.log(JSON.stringify(vision_points));
 };
 function draw_square(p1, p2, p3, p4, color) {
-    var b = true;//clockwise(p1, p2, p3);
-    if (b) {
-        ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.lineTo(p4.x, p4.y);
-        ctx.fillStyle = color;
-        ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.fillStyle = color;
+    ctx.fill();
 }
 function visible(Z) {
     var vision = 100000;
