@@ -36,6 +36,8 @@ handle(Req, State) ->
 	       <<"/orbits.js">> -> F0;
 	       <<"/vision.html">> -> F0;
 	       <<"/vision.js">> -> F0;
+	       <<"/pendulum.html">> -> F0;
+	       <<"/pendulum.js">> -> F0;
 	       <<"/spider.png">> -> F0;
 	       <<"/format.js">> -> F0;
 	       <<"/main.html">> -> F0;

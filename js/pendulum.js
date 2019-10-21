@@ -1,16 +1,18 @@
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 var fps = 30;
-var colors = ["#880000",//red
-              "#000000",//black
-              "#008800",//green
-              "#000088",//blue
-              "#FF0088",//pink
-              "#88FF00",//lime
-              "#FF8800",//neon orange
-              "#00FF88",//green3
-              "#FF0000",//bright red
-             ];
+var time = 0;
+var colors = [
+    "#000000",//black
+    "#008800",//green
+    "#88FF00",//lime
+    "#000088",//blue
+    "#FF0000",//bright red
+    "#FF0088",//pink
+    "#880000",//red
+    "#FF8800",//neon orange
+    "#00FF88",//green3
+];
 var pdb = pdb_maker();
 function minus_3(a, b) {
     return({x: a.x - b.x,
@@ -87,36 +89,38 @@ function three_to_two(a) {
     var Y = (H/2) + (a.y / f);
     return {x: X, y: Y};
 }
-var v1 = pdb.add(0,0,500);
-var v2 = pdb.add(100,0,400);
-var v3 = pdb.add(0,0,700);
-var v4 = pdb.add(0,-200,500);
-var v5 = pdb.add(0,0,300);
-var v6 = pdb.add(-200,10,500);
-var v7 = pdb.add(12000,0,500);
-var v8 = pdb.add(0,0,9000);
-var v9 = pdb.add(0,500,500);
-var things = [
-    sphere_thing(v1, 80, colors[0]),
-    sphere_thing(v2, 60, colors[2]),
-    sphere_thing(v3, 100, colors[4]),
-    sphere_thing(v4, 100, colors[3]),
-    //{where: cube(100, v5),
-    // point: v5,
-    // color: colors[1]},
-    sphere_thing(v6, 20, colors[5]),
-    sphere_thing(v7,10000, colors[6]),
-    sphere_thing(v8, 5000, colors[1]),
-    sphere_thing(v9, 450, colors[8]),
-];
+var points = [];
+var many_points = 15;
+var sphere_size = 20;
+for(var i = 0; i<many_points; i++){
+    points[i] = pdb.add((i*500/many_points)-250,
+                        -(sphere_size),
+                        500);
+};
+var things = [];
+for(var i=0; i<points.length; i++){
+    things[i] = sphere_thing(points[i], sphere_size, colors[i%3]);
+};
+//var things = points.map(function(p) {return(sphere_thing(p, sphere_size, colors[1]));});
+    
 function sphere_thing(point, radius, color){
     return({where: sphere(radius, point),
             point: point,
             color: color});
 };
 
+function adjust_all(){
+    for(var i=0; i<points.length; i++){
+        pdb.adjust(points[i], 0,
+                   8*Math.sin(Math.PI*time*(40+i)/400),
+                   8*Math.cos(Math.PI*time*(40+i)/400));
+    };
+};
+
 function cron(){
     //time_step_page();
+    time += 1;
+    adjust_all();
     movement([37,38,39,40,65,83]);
     draw_helper();
     setTimeout(cron, 1000/fps);
