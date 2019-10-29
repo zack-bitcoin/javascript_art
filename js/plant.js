@@ -300,7 +300,7 @@ document.addEventListener('keydown', function(event) {
     if(cv == false) {
         controls[k] = true;
     };
-
+    //console.log(k);
     //var f = keys[event.keyCode];
     //if(!(f == undefined)){ f(); };
 //    console.log(event.keyCode);
@@ -312,4 +312,4 @@ document.addEventListener('keyup', function(event) {
         controls[k] = false;
     };
 });
- 
+

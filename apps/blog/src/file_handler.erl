@@ -32,6 +32,8 @@ handle(Req, State) ->
 	       <<"/room.js">> -> F0;
 	       <<"/plant.html">> -> F0;
 	       <<"/plant.js">> -> F0;
+	       <<"/chordal.html">> -> F0;
+	       <<"/chordal.js">> -> F0;
 	       <<"/orbits.html">> -> F0;
 	       <<"/orbits.js">> -> F0;
 	       <<"/vision.html">> -> F0;

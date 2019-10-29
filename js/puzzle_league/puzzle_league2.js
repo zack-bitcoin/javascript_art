@@ -246,6 +246,7 @@ function left(){
 };
 
 var fps = 20;
+var button_state = {a: false, x: false, left: false, up: false, right: false, down: false};
 function mainloop() {
     if(!(pause) && !(game_over)) {
         game_time += (1 / fps);
@@ -267,9 +268,47 @@ function mainloop() {
         clearscreen(bool);
         draw_board();
     };
+    var gp = navigator.getGamepads()[0];
+    if (!(gp == undefined)) {
+        handle_button_press(gp.buttons);
+        handle_button_unpress(gp.buttons);
+    };
     setTimeout(mainloop, 1000/fps);
 };
 mainloop();
+var button_names = [
+    ["a", swap_helper, 0],
+    ["x", add_row, 2],
+    ["up", up, 12],
+    ["down", down, 13],
+    ["left", left, 14],
+    ["right", right, 15]
+];
+function handle_button_unpress(buttons) {
+    for(i=0;i<button_names.length;i++){
+        var bn = button_names[i];
+        var num = bn[2];
+        //var fun = bn[1];
+        var name = bn[0];
+        if (buttons[num].value == 0) {
+            button_state[name] = false;
+        };
+    };
+};
+function handle_button_press(buttons) {
+    for(i=0;i<button_names.length;i++){
+        var bn = button_names[i];
+        var num = bn[2];
+        var fun = bn[1];
+        var name = bn[0];
+        if ((buttons[num].value == 1) && (!(button_state[name]))) {
+            button_state[name] = true;
+            fun();
+        };
+
+    };
+    console.log(buttons.map(function(x){return x.value}));
+};
 
 function swap(Y, X) {
     var a = board[Y][X-1];
@@ -290,6 +329,9 @@ function swap(Y, X) {
     points += m;
     best_move = Math.max(best_move, m);
 };
+function swap_helper() {
+    swap(cursor_location[1], cursor_location[0]+1);
+};
 
 //Controller
 
@@ -297,9 +339,7 @@ var keys = {};
 keys[90] = add_row;//z key
 keys[80] = pause_func;//p key
 keys[82] = new_game;//r key
-keys[32] = function() {//space bar
-    swap(cursor_location[1], cursor_location[0]+1);
-};
+keys[32] = swap_helper;
 //arrow keys
 keys[37] = left;
 keys[39] = right;
@@ -333,5 +373,32 @@ document.addEventListener('click', function(e){
         X = Math.max(X, 1);
         swap(Y, X);
     };
+});
+
+
+
+
+//navigator.getGamepads()[0].buttons[0];
+var gamepads = {};
+
+function gamepadHandler(event, connecting) {
+  var gamepad = event.gamepad;
+  // Note:
+  // gamepad === navigator.getGamepads()[gamepad.index]
+
+  if (connecting) {
+    gamepads[gamepad.index] = gamepad;
+  } else {
+    delete gamepads[gamepad.index];
+  }
+}
+
+window.addEventListener("gamepadconnected", function(e) { gamepadHandler(e, true); }, false);
+//window.addEventListener("gamepaddisconnected", function(e) { gamepadHandler(e, false); }, false);
+window.addEventListener("gamepadconnected", function(e) {
+  var gp = navigator.getGamepads()[e.gamepad.index];
+  console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+    gp.index, gp.id,
+    gp.buttons.length, gp.axes.length);
 });
 
