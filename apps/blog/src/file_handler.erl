@@ -12,6 +12,8 @@ handle(Req, State) ->
     PrivDir0 = "../../../../js",
     PrivDir = list_to_binary(PrivDir0),
     F = case F0 of
+	       <<"/virus.js">> -> F0;
+	       <<"/virus.html">> -> F0;
 	       <<"/codecBytes.js">> -> F0;
 	       <<"/puzzle_league.js">> -> F0;
 	       <<"/puzzle_league/puzzle_league2.js">> -> F0;
