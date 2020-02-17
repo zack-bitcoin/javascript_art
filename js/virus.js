@@ -1,3 +1,19 @@
+
+var rounds_constant = 2000;
+var infectious_constant = 1.4;
+var deadliness_constant = 1;
+var recovery_constant = 0.02;
+var medical_max_constant = 1.01;
+var critical_max_constant = 1.01;
+
+var population = 1000000;
+var medical_workers = 1000;
+var critical_workers = 1000;
+
+var initial_sick = 10;
+var deliberate_c = 100;
+var deliberate_m = 100;
+
 /* ) Disease stages: dead; well: never sick, exposed, recovered; sick: infectious but asymptomatic, symptomatic, intensive care
 2) Pools: general, quarantine, medical. Those sick:symptomatic or in quarantine are NOT at work. 
 3) Worker types: general, critical, medical
@@ -92,10 +108,6 @@ function quarantine_rule(P){
     return(P);
 };
 
-function infected_portion(P) {
-    return(infected_portion2(P, ["quarantine", "free"], ["general", "critical", "medical"]));
-};
-        
 function infected_portion2(P, qt, types) {
     var total = 0;
     var sick = 0;
@@ -114,10 +126,6 @@ function infected_portion2(P, qt, types) {
         return(0);
     };
     return(sick/total);
-};
-function infected_free_medical(P) {
-    return(infected_portion2(P, ["free"], ["medical"]));
-    
 };
 function working(P, type){
     var total = 0;
@@ -141,12 +149,7 @@ function time_step(P){
     var infected_portion = infected_portion2(P, ["free", "quarantine"], ["general", "critical", "medical"]);
     var critical_working = working(P, "critical");
     var medical_working = working(P, "medical");
-    //var infectious_constant = 835;//439.89;
-    var infectious_constant = 1.4;//439.89;
-    var deadliness_constant = 1;
-    var recovery_constant = 0.02;
-    var medical_max_constant = 1.01;
-    var critical_max_constant = 1.01;
+    
 
     var medical_infected = infected_portion2(P, ["free"], ["medical"]);
     var general_infected = infected_portion2(P, ["free"], ["general", "critical"]);
@@ -217,14 +220,12 @@ function time_step(P){
 
 
 function doit(P){
-    var rounds = 2000;
-    for(var i = 0; i < rounds; i ++){
+    for(var i = 0; i < rounds_constant; i ++){
         P = time_step(P);
     };
     var total = sum_all(P);
-    console.log("portion survived: ");
-    console.log((total - P.dead)/total);
-    return P;
+    return((total - P.dead)/total);
+    //return P;
 };
 function sum_all(P){
     var total = 0;
@@ -241,13 +242,26 @@ function sum_all(P){
 
 
 function test_infect() {
-    var total = 1000000;
-    var P = new_pools(10, total, 100, 1000, 100, 1000);
+    var P = new_pools(initial_sick, population,
+                      deliberate_c, critical_workers,
+                      deliberate_m, medical_workers);
     return(doit(P));
 };
+
 function test_no_infect() {
-    var total = 1000000;
-    var P = new_pools(10, total, 0, 1000, 0, 1000);
+    var P = new_pools(initial_sick, population,
+                      0, critical_workers,
+                      0, medical_workers);
     return(doit(P));
 };
-    
+
+
+function test(){
+    var I = test_infect();
+    var N = test_no_infect();
+
+    console.log("survivors if we deliberately infect: ");
+    console.log(I);
+    console.log("survivors if we do not infect on purpose: ");
+    console.log(N);
+};
