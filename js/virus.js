@@ -30,25 +30,21 @@ Are there simple cases of fewer total dead if take medical, critical workers and
 
 //each worker has a job-type, a pool, and a disease stage. It is a 3D matrix.
 
-function new_disease_obj(
-    never_sick,
-    asymptomatic){
+function new_disease_obj(n, a){
     return {
-        never_sick: never_sick,
+        never_sick: n,
         exposed: 0,
         recovered: 0,
 
-        asymptomatic: asymptomatic,
+        asymptomatic: a,
         symptomatic: 0,
         intensive_care: 0
     };
 };
 
-
-function new_workers(g0, g1, c0, c1, m0, m1) {
-    //g0 is the general workers who start out as sick and asymptomatic.
-    //g1 is the general workers who start out as healthy
-    //c1,m1 are the amounts of the critical and medical workers.
+function new_workers(g0, g1,//general workers, healthy and sick
+                     c0, c1,//critical workers
+                     m0, m1) { // medical workers
     var g = new_disease_obj(g1,g0);
     var c = new_disease_obj(c1,g0);
     var m = new_disease_obj(m1,m0);
@@ -167,7 +163,7 @@ function time_step(P){
             ["quarantine"],
             ["general", "critical", "medical"]);
 
-    //some never_sick and exposed medical personal become sick.
+    //some medical personal become sick.
     (["free"]).map(function(q){
         (["medical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
