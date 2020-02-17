@@ -75,35 +75,24 @@ function new_pools(unintentionally_sick, g,
     });
 };
 
-function move_portion_quarantine(P, type, portion) {
-    var v = ["general", "critical", "medical"];
-    v.map(function(t){
-        x = P.free[t][type] * portion;
-        P.quarantine[t][type] += x;
-        P.free[t][type] -= x;
-    });
-    return(P);
-};
-function move_portion_free(P, type, portion) {
-    var v = ["general", "critical", "medical"];
-    v.map(function(t){
-        x = P.quarantine[t][type] * portion;
-        P.free[t][type] += x;
-        P.quarantine[t][type] -= x;
-    });
-    return(P);
-};
-
-
 function quarantine_rule(P){
     //example of how we could decide who to quarantine
+    var v = ["general", "critical", "medical"];
     
     //quarantine everyone who is symptomatic.
     //maybe add a maximum size of people who fit in quarantine.
-    P = move_portion_quarantine(P, "symptomatic", 1);
+    v.map(function(t){
+        x = P.free[t].symptomatic;
+        P.quarantine[t].symptomatic += x;
+        P.free[t].symptomatic -= x;
+    });
 
     //unquarantine everyone who is recovered
-    P = move_portion_free(P, "recovered", 1);
+    v.map(function(t){
+        x = P.quarantine[t].recovered;
+        P.free[t].recovered += x;
+        P.quarantine[t].recovered -= x;
+    });
 
     return(P);
 };
