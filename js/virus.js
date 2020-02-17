@@ -16,42 +16,26 @@ Are there simple cases of fewer total dead if take medical, critical workers and
 
 function new_disease_obj(
     never_sick,
-    exposed,
-    recovered,
-    asymptomatic,
-    symptomatic,
-    intensive_care){
+    asymptomatic){
     return {
         never_sick: never_sick,
-        exposed: exposed,
-        recovered: recovered,
+        exposed: 0,
+        recovered: 0,
 
         asymptomatic: asymptomatic,
-        symptomatic: symptomatic,
-        intensive_care: intensive_care
+        symptomatic: 0,
+        intensive_care: 0
     };
 };
-/*
-function well(x) {
-    return(x.never_sick +
-           x.exposed +
-           x.recovered);
-};
-function sick(x) {
-    return(x.asymptomatic +
-           x.symptomatic +
-           x.intensive_care);
-};
-*/
 
 
 function new_workers(g0, g1, c0, c1, m0, m1) {
     //g0 is the general workers who start out as sick and asymptomatic.
     //g1 is the general workers who start out as healthy
     //c1,m1 are the amounts of the critical and medical workers.
-    var g = new_disease_obj(g1,0,0,g0,0,0);
-    var c = new_disease_obj(c1,0,0,g0,0,0);
-    var m = new_disease_obj(m1,0,0,m0,0,0);
+    var g = new_disease_obj(g1,g0);
+    var c = new_disease_obj(c1,g0);
+    var m = new_disease_obj(m1,m0);
     return({
         general: g,
         critical: c,
@@ -226,18 +210,6 @@ function time_step(P){
             });
         });
     });
-
-    //not possible to have negative amounts of people
-    /*
-    (["free", "quarantine"]).map(function(q){
-        (["medical", "general", "critical"]).map(function(wt){
-            (["never_sick","exposed","recovered","asymptomatic", "symptomatic", "intensive_care"]).map(function(dt){
-                var x = P[q][wt][dt];
-                P[q][wt][dt] = Math.max(0, x);
-            });
-        });
-    });
-    */
 //8) Perhaps some chance of [recovered -> sick]
     P = quarantine_rule(P);
     return(P);
@@ -246,21 +218,12 @@ function time_step(P){
 
 function doit(P){
     var rounds = 2000;
-    //var P = new_pools(10, total, 0, 1000, 0, 1000);
-    //var total = 1000000;
-    //var P = new_pools(10, total, 100, 1000, 100, 1000);
     for(var i = 0; i < rounds; i ++){
         P = time_step(P);
-        /*
-          if(P.dead > total){
-            console.log("all dead");
-            return(P);
-        };
-        */
     };
     var total = sum_all(P);
+    console.log("portion survived: ");
     console.log((total - P.dead)/total);
-    console.log("portion survived");
     return P;
 };
 function sum_all(P){
