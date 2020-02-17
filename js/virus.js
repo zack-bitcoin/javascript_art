@@ -146,19 +146,38 @@ function working(P, type){
 };
 
 function time_step(P){
-    var infected_portion = infected_portion2(P, ["free", "quarantine"], ["general", "critical", "medical"]);
+    var infected_portion =
+        infected_portion2(
+            P,
+            ["free", "quarantine"],
+            ["general","critical","medical"]);
     var critical_working = working(P, "critical");
     var medical_working = working(P, "medical");
     
 
-    var medical_infected = infected_portion2(P, ["free"], ["medical"]);
-    var general_infected = infected_portion2(P, ["free"], ["general", "critical"]);
-    var quarantine_infected = infected_portion2(P, ["quarantine"], ["general", "critical", "medical"]);
+    var medical_infected =
+        infected_portion2(
+            P, ["free"], ["medical"]);
+    var general_infected =
+        infected_portion2(
+            P,
+            ["free"],
+            ["general", "critical"]);
+    var quarantine_infected =
+        infected_portion2(
+            P,
+            ["quarantine"],
+            ["general", "critical", "medical"]);
 
     (["free"]).map(function(q){
         (["medical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
-                var portion = (infected_portion + medical_infected) * (critical_max_constant - critical_working) * infectious_constant;
+                var portion =
+                    (infected_portion +
+                     medical_infected) *
+                    (critical_max_constant -
+                     critical_working) *
+                    infectious_constant;
                 portion = Math.min(portion, 1);
                 var x = P[q][wt][type] * portion;
                 P[q][wt]["asymptomatic"] += x;
@@ -167,7 +186,12 @@ function time_step(P){
         });
         (["general", "critical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
-                var portion = (infected_portion + general_infected) * (critical_max_constant - critical_working) * infectious_constant;
+                var portion =
+                    (infected_portion +
+                     general_infected) *
+                    (critical_max_constant -
+                     critical_working) *
+                    infectious_constant;
                 portion = Math.min(portion, 1);
                 var x = P[q][wt][type] * portion;
                 P[q][wt]["asymptomatic"] += x;
@@ -178,7 +202,12 @@ function time_step(P){
     (["quarantine"]).map(function(q){
         (["general", "critical", "medical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
-                var portion = (infected_portion + quarantine_infected) * (critical_max_constant - critical_working) * infectious_constant;
+                var portion =
+                    (infected_portion +
+                     quarantine_infected) *
+                    (critical_max_constant -
+                     critical_working) *
+                    infectious_constant;
                 portion = Math.min(portion, 1);
                 var x = P[q][wt][type] * portion;
                 P[q][wt]["asymptomatic"] += x;
@@ -188,7 +217,10 @@ function time_step(P){
     });
     (["free", "quarantine"]).map(function(q){
         (["medical", "general", "critical"]).map(function(wt){
-            var portion = deadliness_constant * (medical_max_constant - medical_working);
+            var portion =
+                deadliness_constant *
+                (medical_max_constant -
+                 medical_working);
             portion = Math.min(portion, 1);
             var a = P[q][wt]["asymptomatic"];
             var s = P[q][wt]["symptomatic"];
@@ -264,4 +296,5 @@ function test(){
     console.log(I);
     console.log("survivors if we do not infect on purpose: ");
     console.log(N);
+    return(0);
 };
