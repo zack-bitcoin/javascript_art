@@ -135,29 +135,39 @@ function working(P, type){
 };
 
 function time_step(P){
+    //fraction of total population that is infected
     var infected_portion =
         infected_portion2(
             P,
             ["free", "quarantine"],
             ["general","critical","medical"]);
+
+    //fraction of the critical workers that are working
     var critical_working = working(P, "critical");
+
+    //fraction of the medical workers that are working
     var medical_working = working(P, "medical");
     
-
+    //fraction of the medical workers that are sick
     var medical_infected =
         infected_portion2(
             P, ["free"], ["medical"]);
+
+    //fraction of general workers that are sick.
     var general_infected =
         infected_portion2(
             P,
             ["free"],
             ["general", "critical"]);
+
+    //fraction of quarantined population that is sick.
     var quarantine_infected =
         infected_portion2(
             P,
             ["quarantine"],
             ["general", "critical", "medical"]);
 
+    //some never_sick and exposed medical personal become sick.
     (["free"]).map(function(q){
         (["medical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
@@ -173,6 +183,7 @@ function time_step(P){
                 P[q][wt][type] -= x;
             });
         });
+        //some other workers become sick.
         (["general", "critical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
                 var portion =
@@ -188,6 +199,7 @@ function time_step(P){
             });
         });
     });
+    //some people in quarantine become sick.
     (["quarantine"]).map(function(q){
         (["general", "critical", "medical"]).map(function(wt){
             (["never_sick", "exposed"]).map(function(type){
@@ -204,6 +216,7 @@ function time_step(P){
             });
         });
     });
+    //some people who are sick become more sick.
     (["free", "quarantine"]).map(function(q){
         (["medical", "general", "critical"]).map(function(wt){
             var portion =
@@ -220,6 +233,7 @@ function time_step(P){
             P.dead += portion*i;
         });
     });
+    //some sick people recover from their illness.
     (["free", "quarantine"]).map(function(q){
         (["medical", "general", "critical"]).map(function(wt){
             (["asymptomatic", "symptomatic", "intensive_care"]).map(function(dt){
