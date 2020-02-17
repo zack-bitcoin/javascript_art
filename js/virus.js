@@ -15,7 +15,6 @@ Are there simple cases of fewer total dead if take medical, critical workers and
 //each worker has a job-type, a pool, and a disease stage. It is a 3D matrix.
 
 function new_disease_obj(
-    dead,
     never_sick,
     exposed,
     recovered,
@@ -23,15 +22,16 @@ function new_disease_obj(
     symptomatic,
     intensive_care){
     return {
-        dead: dead,
         never_sick: never_sick,
         exposed: exposed,
         recovered: recovered,
+
         asymptomatic: asymptomatic,
         symptomatic: symptomatic,
         intensive_care: intensive_care
     };
 };
+/*
 function well(x) {
     return(x.never_sick +
            x.exposed +
@@ -42,21 +42,16 @@ function sick(x) {
            x.symptomatic +
            x.intensive_care);
 };
+*/
 
 
-function new_workers(x, g1, c1, m1) {
-    //x is the portion of general workers who start out as sick and asymptomatic.
-    //g1,c1,m1 are the relative amounts of the 3 types of workers.
-    var total = g1 + c1 + m1;
-    var sick = g1*x/total;
-    var well = (g1/total) - sick;
-    if((x < 0) || (x > 1)) {
-        console.log("can't be above 100 000");
-        return(0);
-    };
-    var g = new_disease_obj(0,well,0,0,sick,0,0);
-    var c = new_disease_obj(0,c1/total,0,0,0,0,0);
-    var m = new_disease_obj(0,m1/total,0,0,0,0,0);
+function new_workers(g0, g1, c0, c1, m0, m1) {
+    //g0 is the general workers who start out as sick and asymptomatic.
+    //g1 is the general workers who start out as healthy
+    //c1,m1 are the amounts of the critical and medical workers.
+    var g = new_disease_obj(g1,0,0,g0,0,0);
+    var c = new_disease_obj(c1,0,0,g0,0,0);
+    var m = new_disease_obj(m1,0,0,m0,0,0);
     return({
         general: g,
         critical: c,
@@ -64,26 +59,176 @@ function new_workers(x, g1, c1, m1) {
     });
 };
 
-function new_pools(sick, g, c, m) {
-    var g = new_workers(0,g,c,m);//everyone starts as not in quarantine.
-    var q = new_workers(0,0,0,0);
+
+function new_pools(unintentionally_sick, g,
+                   deliberate_critical, c,
+                   deliberate_medical, m) {
+    //all unintentionally sick start in the general population, for simplicity.
+    // all deliberate sick start in quarantine, because we know who was infected.
+    var f = new_workers(unintentionally_sick,g,0,c,0,m);
+    var q = new_workers(0,0,deliberate_critical,
+                        0,deliberate_medical,0);
     return({
-        general: g,
-        quarantine: q
+        free: f,
+        quarantine: q,
+        dead: 0
     });
 };
 
+function move_portion_quarantine(P, type, portion) {
+    var v = ["general", "critical", "medical"];
+    v.map(function(t){
+        x = P.free[t][type] * portion;
+        P.quarantine[t][type] += x;
+        P.free[t][type] -= x;
+    });
+    return(P);
+};
+function move_portion_free(P, type, portion) {
+    var v = ["general", "critical", "medical"];
+    v.map(function(t){
+        x = P.quarantine[t][type] * portion;
+        P.free[t][type] += x;
+        P.quarantine[t][type] -= x;
+    });
+    return(P);
+};
+
+
+function quarantine_rule(P){
+    //example of how we could decide who to quarantine
+    
+    //quarantine everyone who is symptomatic.
+    //maybe add a maximum size of people who fit in quarantine.
+    P = move_portion_quarantine(P, "symptomatic", 1);
+
+    //unquarantine everyone who is recovered
+    P = move_portion_free(P, "recovered", 1);
+
+    return(P);
+};
+
+function infected_portion(P) {
+    return(infected_portion2(P, ["quarantine", "free"], ["general", "critical", "medical"]));
+};
+        
+function infected_portion2(P, qt, types) {
+    var total = 0;
+    var sick = 0;
+    (qt).map(function(q){
+        (types).map(function(wt){
+            (["asymptomatic", "symptomatic", "intensive_care"]).map(function(sick_type){
+                sick += P[q][wt][sick_type];
+                total += P[q][wt][sick_type];
+            });
+            (["never_sick", "exposed", "recovered"]).map(function(well_type){
+                total += P[q][wt][well_type];
+            });
+        });
+    });
+    if(total == 0){
+        return(0);
+    };
+    return(sick/total);
+};
+function infected_free_medical(P) {
+    return(infected_portion2(P, ["free"], ["medical"]));
+    
+};
+function working(P, type){
+    var total = 0;
+    var working = 0;
+    (["never_sick", "exposed", "recovered", "asymptomatic"]).map(function(wt){
+        working += P.free[type][wt];
+        total += P.free[type][wt];
+        total += P.quarantine[type][wt];
+    });
+    (["symptomatic", "intensive_care"]).map(function(wt){
+        total += P.free[type][wt];
+        total += P.quarantine[type][wt];
+    });
+    return(working/total);
+};
 
 function time_step(P){
-//5) Chances of [uninfected -> infected] depend on % infectious in own pool, plus leakage: % of all infectious
-//6) Chances of [symptomatic -> intensive care -> dead, recovered] depends on ratio of sick to healthy medical workers
-//7) Chances of [well -> sick] depend on general level of the economy, which depends on % of critical workers at work.
-//8) Perhaps some chance of [recovered -> sick]
+    var infected_portion = infected_portion2(P, ["free", "quarantine"], ["general", "critical", "medical"]);
+    var critical_working = working(P, "critical");
+    var medical_working = working(P, "medical");
+    var infectious_constant = 0.1;
+    var deadliness_constant = 0.2;
+    var recovery_constant = 0.1;
 
+    var medical_infected = infected_portion2(P, ["free"], ["medical"]);
+    var general_infected = infected_portion2(P, ["free"], ["general", "critical"]);
+    var quarantine_infected = infected_portion2(P, ["quarantine"], ["general", "critical", "medical"]);
+
+    (["free"]).map(function(q){
+        (["medical"]).map(function(wt){
+            (["never_sick", "exposed"]).map(function(type){
+                var portion = infected_portion * (1 - critical_working) * medical_infected * infectious_constant;
+                var x = P[q][wt][type] * portion;
+                P[q][wt]["asymptomatic"] += x;
+                P[q][wt][type] -= x;
+            });
+        });
+        (["general", "critical"]).map(function(wt){
+            (["never_sick", "exposed"]).map(function(type){
+                var portion = infected_portion * (1 - critical_working) * general_infected * infectious_constant;
+                var x = P[q][wt][type] * portion;
+                P[q][wt]["asymptomatic"] += x;
+                P[q][wt][type] -= x;
+            });
+        });
+    });
+    (["quarantine"]).map(function(q){
+        (["general", "critical", "medical"]).map(function(wt){
+            (["never_sick", "exposed"]).map(function(type){
+                var portion = infected_portion * (1 - critical_working) * quarantine_infected * infectious_constant;
+                var x = P[q][wt][type] * portion;
+                P[q][wt]["asymptomatic"] += x;
+                P[q][wt][type] -= x;
+            });
+        });
+    });
+    (["free", "quarantine"]).map(function(q){
+        (["medical", "general", "critical"]).map(function(wt){
+            var portion = deadliness_constant * (1 - medical_working);
+            var a = P[q][wt]["asymptomatic"];
+            var s = P[q][wt]["symptomatic"];
+            var i = P[q][wt]["intensive_care"];
+            P[q][wt]["asymptomatic"] -= portion*a;
+            P[q][wt]["symptomatic"] += portion*(a-s);
+            P[q][wt]["intensive_care"] += portion*(s-i);
+            P.dead += i;
+        });
+    });
+    (["free", "quarantine"]).map(function(q){
+        (["medical", "general", "critical"]).map(function(wt){
+            (["asymptomatic", "symptomatic", "intensive_care"]).map(function(dt){
+                var portion = recovery_constant;
+                var x = P[q][wt][dt];
+                P[q][wt][dt] -= (x*portion);
+                P[q][wt]["recovered"] += (x*portion);
+            });
+        });
+    });
+    /*
+    */
+//8) Perhaps some chance of [recovered -> sick]
+    P = quarantine_rule(P);
+    return(P);
 };
 
 
 function doit(){
-    var P = new_pools(0.001, 1000, 10, 10);
+    var P = new_pools(100, 1000000, 0, 1000, 0, 1000);
+    P = time_step(P);
+    P = time_step(P);
+    P = time_step(P);
+    P = time_step(P);
+    P = time_step(P);
+    P = time_step(P);
+    P = time_step(P);
+    //P = quarantine_rule(P);
     return P;
 };
