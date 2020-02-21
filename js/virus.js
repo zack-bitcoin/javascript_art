@@ -9,6 +9,7 @@ var critical_max_constant = 1.01;
 var population = 1000000;
 var medical_workers = 1000;
 var critical_workers = 1000;
+var everyone = population + medical_workers + critical_workers;
 
 var initial_sick = 10;
 var deliberate_c = 100;
@@ -143,6 +144,7 @@ function time_step(P){
 
     //fraction of the medical workers that are working
     var medical_working = working(P, "medical");
+    var medical_concentration = medical_working * medical_workers * 1000 / (everyone * infected_portion);
     
     //fraction of the medical workers that are sick
     var medical_infected =
@@ -216,9 +218,8 @@ function time_step(P){
     (["free", "quarantine"]).map(function(q){
         (["medical", "general", "critical"]).map(function(wt){
             var portion =
-                deadliness_constant *
-                (medical_max_constant -
-                 medical_working);
+                deadliness_constant /
+                medical_concentration;
             portion = Math.min(portion, 1);
             var a = P[q][wt]["asymptomatic"];
             var s = P[q][wt]["symptomatic"];
