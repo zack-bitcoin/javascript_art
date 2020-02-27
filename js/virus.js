@@ -1,9 +1,10 @@
 
-var rounds_constant = 2000;
+var rounds_constant = 6000;
 var infectious_constant = 1.4;
-var deadliness_constant = 1;
-var recovery_constant = 0.02;
-var medical_max_constant = 1.01;
+//var deadliness_constant = 1;
+var deadliness_constant = 0.0005;
+var recovery_constant = 0.020;
+//var medical_max_constant = 1.01;
 var critical_max_constant = 1.01;
 
 var population = 1000000;
@@ -11,9 +12,11 @@ var medical_workers = 1000;
 var critical_workers = 1000;
 var everyone = population + medical_workers + critical_workers;
 
+var quarantine_limit = 10000;
+
 var initial_sick = 10;
-var deliberate_c = 100;
-var deliberate_m = 100;
+var deliberate_c = 900;
+var deliberate_m = 900;
 
 /* ) Disease stages: dead; well: never sick, exposed, recovered; sick: infectious but asymptomatic, symptomatic, intensive care
 2) Pools: general, quarantine, medical. Those sick:symptomatic or in quarantine are NOT at work. 
@@ -78,10 +81,22 @@ function quarantine_rule(P){
     
     //quarantine everyone who is symptomatic.
     //maybe add a maximum size of people who fit in quarantine.
+    var already_quarantined = 0;
+
+    (["medical", "general", "critical"]).map(function(wt){
+        (["never_sick", "exposed", "recovered", "asymptomatic", "symptomatic", "intensive_care"]).map(function(dt){
+            already_quarantined += P.quarantine[wt][dt];
+        });
+    });
+
+    
     v.map(function(t){
-        x = P.free[t].symptomatic;
-        P.quarantine[t].symptomatic += x;
-        P.free[t].symptomatic -= x;
+        if(already_quarantined < quarantine_limit){
+            x = P.free[t].symptomatic;
+            P.quarantine[t].symptomatic += x;
+            already_quarantined += x;
+            P.free[t].symptomatic -= x;
+        };
     });
 
     //unquarantine everyone who is recovered
@@ -144,7 +159,10 @@ function time_step(P){
 
     //fraction of the medical workers that are working
     var medical_working = working(P, "medical");
-    var medical_concentration = medical_working * medical_workers * 1000 / (everyone * infected_portion);
+    var medical_concentration = Math.log(medical_working * medical_workers) * 500 / (everyone * infected_portion);
+    //console.log(JSON.stringify(medical_concentration));
+    //console.log(JSON.stringify(medical_working));
+    //console.log(JSON.stringify(medical_workers));
     
     //fraction of the medical workers that are sick
     var medical_infected =
@@ -268,6 +286,8 @@ function sum_all(P){
             });
         });
     });
+    console.log(JSON.stringify(P.free.general.recovered));
+    console.log(JSON.stringify(P.free.general.never_sick));
     total += P.dead;
     return(total);
 };
