@@ -1,5 +1,5 @@
 
-//<div style="line-height:24%;display:inline-block;">
+//<div style="line-height:24%;">
 
 function br() {
     return document.createElement("br");
@@ -14,7 +14,7 @@ var long_div = div();
 long_div.style = "line-height:124%;";
 
 function add_string(div, S) {
-    //// if you use spans this way, then the text can be edited later without having to rewrite the entire div.
+    //// if you use spans to name the text, then the text can be edited later without having to rewrite the entire div.
     //var span1 = document.createElement("span");
     //span1.innerHTML = S;
     //div.appendChild(span1);
