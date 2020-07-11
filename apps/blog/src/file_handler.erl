@@ -12,6 +12,8 @@ handle(Req, State) ->
     PrivDir0 = "../../../../js",
     PrivDir = list_to_binary(PrivDir0),
     F = case F0 of
+            <<"/css_example.html">> -> <<"/css_in_javascript_example/css_example.html">>;
+            <<"/css_example.js">> -> <<"/css_in_javascript_example/css_example.js">>;
 	       <<"/virus.js">> -> F0;
 	       <<"/virus.html">> -> F0;
 	       <<"/codecBytes.js">> -> F0;
