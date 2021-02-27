@@ -20,10 +20,10 @@ var planets = [
     make_planet(100, 0, starting_distance, 0, 0, 1, 40, colors[1]),
     make_planet(0, 50, starting_distance, 0, 0, -1, 40, colors[2]),
     make_planet(10, 50, starting_distance, 2, 0, 0, 10, colors[3]),
-    make_planet(0, 0, starting_distance, -2, 0, 0, 10, colors[4]),
+    make_planet(0, 10, starting_distance, -2, 0, 0, 10, colors[4]),
     make_planet(10, 50, starting_distance, 0, 1, 0, 5, colors[7]),
-    make_planet(0, 0, starting_distance, 0, -1, 0, 5, colors[6]),
-    make_planet(0, 100, starting_distance, 0, -3, 0, 1, colors[5]),
+    make_planet(10, 0, starting_distance, 0, -1, 0, 5, colors[6]),
+    make_planet(10, 100, starting_distance, 0, -3, 0, 1, colors[5]),
     make_planet(0, 100, starting_distance, 0, 3, 0, 1, colors[0]),
     make_planet(0, 0, starting_distance, 0, 0, 0, 100, colors[8]),
 ];
@@ -64,6 +64,7 @@ function three_to_two(a) {
 }
 
 function make_planet(X, Y, Z, dX, dY, dZ, Mass, Color) {
+    Mass = Mass * Math.random();
     return({x: X, y: Y, z: Z, dx: dX, dy: dY, dz: dZ, mass: Mass, color: Color});
 };
 function force(X, Y, Z){
@@ -76,13 +77,26 @@ function force(X, Y, Z){
         var d2 = (dx*dx) + (dy*dy) + (dz*dz);
         if (!(d2 == 0)){
             var m = p.mass/d2;//magnitude
-            var distance = Math.max(Math.sqrt(d2), 20);
-            var m = p.mass / distance;
             //console.log(JSON.stringify([dx, d2, m, distance]));
-            var z = 20;
-            A[0] -= (m * dx / distance)*z;
-            A[1] -= (m * dy / distance)*z;
-            A[2] -= (m * dz / distance)*z;
+            if(true){
+                //1/r gravity
+                var distance = Math.max(Math.sqrt(d2), 20);
+                var distance = Math.sqrt(d2);
+                var m = p.mass / distance;
+                var z = 20;
+                A[0] -= (m * dx / distance)*z;
+                A[1] -= (m * dy / distance)*z;
+                A[2] -= (m * dz / distance)*z;
+            } else {
+                //1/r^2 gravity
+                var distance = Math.max(Math.sqrt(d2), 20);
+                //var distance = Math.sqrt(d2);
+                var m = p.mass / distance;
+                var z = 20;
+                A[0] -= (m * dx / distance / distance)*z;
+                A[1] -= (m * dy / distance / distance)*z;
+                A[2] -= (m * dz / distance / distance)*z;
+            }
         };
     };
     return(A);
