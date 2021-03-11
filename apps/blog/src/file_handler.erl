@@ -65,6 +65,9 @@ handle(Req, State) ->
 	       <<"/star_go.png">> -> F0;
 	       <<"/empty_go.png">> -> F0;
 	       <<"/mark_go.png">> -> F0;
+	       <<"/seximal.html">> -> F0;
+	       <<"/clock.js">> -> F0;
+	       <<"/time_conversion.js">> -> F0;
                X -> 
                 io:fwrite("ext file handler block access to: "),
                 io:fwrite(X),
