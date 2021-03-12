@@ -1,7 +1,3 @@
-//kilometros / hora
-//30 kilometros en 3 horas
-
-
 var clock = (function(){
     var div = document.createElement("div");
     document.body.appendChild(div);
@@ -112,8 +108,14 @@ var clock = (function(){
               hours) / 24);
         var seximal_spans =
             seximal_day * 216 * 6;
-        var time = seximal_spans.toString(6)
-            .match(/[^.]*.\d\d\d/)[0];
+        var spans_string = seximal_spans.toString(6);
+        if(!(spans_string.match(/\./))){
+            spans_string =
+                spans_string
+                .concat(".000");
+        };
+        var time = spans_string.toString(6)
+            .match(/[^.]*\.\d?\d?\d?/)[0];
         return(time);
     };
 

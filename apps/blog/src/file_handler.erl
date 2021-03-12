@@ -68,6 +68,8 @@ handle(Req, State) ->
 	       <<"/seximal.html">> -> F0;
 	       <<"/clock.js">> -> F0;
 	       <<"/time_conversion.js">> -> F0;
+	       <<"/length_conversion.js">> -> F0;
+	       <<"/date_conversion.js">> -> F0;
                X -> 
                 io:fwrite("ext file handler block access to: "),
                 io:fwrite(X),
