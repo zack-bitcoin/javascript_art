@@ -52,8 +52,10 @@
         day = day - (off / (24*60));
         var hours = day * 24;
         var hours2 = Math.floor(hours);
-        var minutes = Math.round(60*(hours - hours2));
-        div.appendChild(document.createElement("br"));
+        var minutes = Math.round(60*(hours - hours2)).toString();
+        if(minutes.length === 1){
+            minutes = "0".concat(minutes);
+        };
         decimal_result.innerHTML = hours2.toString()
             .concat(":")
             .concat(minutes);
