@@ -6,7 +6,6 @@
     
     var to_seximal_text = document.createElement("input");
     to_seximal_text.type = "text";
-    to_seximal_text.value = "1.83";
     div.appendChild(to_seximal_text);
     div.appendChild(document.createElement("br"));
 
@@ -25,7 +24,6 @@
     var num2seximal_text =
         document.createElement("input");
     num2seximal_text.type = "text";
-    num2seximal_text.value = "1.83";
     div.appendChild(num2seximal_text);
     div.appendChild(document.createElement("br"));
 

@@ -58,7 +58,7 @@
     div.appendChild(sex_date_label);
     var sex_date_text = document.createElement("input");
     sex_date_text.type = "text";
-    sex_date_text.value = "00.14.05";
+    sex_date_text.value = "100.14.05";
     div.appendChild(sex_date_text);
 
     var seximal2dec = document.createElement("input");
