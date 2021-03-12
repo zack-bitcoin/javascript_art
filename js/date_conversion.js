@@ -25,6 +25,7 @@
     div.appendChild(dec_day_label);
     var select_dec_day = document.createElement("select");
     add_options(select_dec_day, 1, 32);
+    select_dec_day.value = 20;
     div.appendChild(select_dec_day);
 
     div.appendChild(document.createElement("br"));
@@ -33,6 +34,7 @@
     div.appendChild(dec_month_label);
     var select_dec_month = document.createElement("select");
     add_options(select_dec_month, 1, 13);
+    select_dec_month.value = 12;
     div.appendChild(select_dec_month);
 
     div.appendChild(document.createElement("br"));
@@ -41,7 +43,7 @@
     div.appendChild(dec_year_label);
     var dec_year_text = document.createElement("input");
     dec_year_text.type = "text";
-    dec_year_text.value = "2021";
+    dec_year_text.value = "2020";
     div.appendChild(dec_year_text);
 
     var dec2seximal = document.createElement("input");
@@ -74,14 +76,19 @@
     
     function seximal2dec_fun(){
         var s = sex_date_text.value.trim();
-        var year = s.match(/^\d*\./)[0].slice(0, -1);
+        var year = s.match(/^-?\d*\./)[0].slice(0, -1);
         var nif = s.match(/\.\d\d\./)[0].slice(1, -1);
         var day = s.match(/\.\d\d$/)[0].slice(1);
         year = to10(year);
         nif = to10(nif);
         day = to10(day);
 
-        var octs = Math.floor(year/8);
+        var octs = 0;
+        if(year > 0){
+            octs = Math.floor(year/8);
+        } else {
+            octs = Math.ceil((year)/8);
+        };
         var year = year % 8;
         
         var days = day + (nif*36) + (year*366) + (octs*2922);
@@ -135,13 +142,24 @@
 
     function days2date(days){
         var octs = 0;
-        if(days > 2922){
+        if(days > 0){
             octs = Math.floor(days / 2922);
-            days = days % 2922;
+        } else if (days < 0){
+            octs = Math.ceil((days+1) / 2922);
         };
-        var years = Math.floor(days / 366) +
-            (8*octs);
+        days = days % 2922;
+        var years = 8*octs;
+        if(days > 0){
+            years = Math.floor(days / 366) + years;
+        } else if (days === 0){
+            
+        } else if (days < 0){
+            years = Math.ceil((days+1) / 366) + years-1;
+        }
         var days = days % 366;
+        if(days < 0){
+            days = days + 366;
+        };
         var nifs = Math.floor(days / 36);
         var days = days % 36;
         return([to6(days), to6(nifs), to6(years)]);
