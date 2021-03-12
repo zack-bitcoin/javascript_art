@@ -8,8 +8,11 @@
     //leap years have 366 days. non-leap years have 360 days.
 
     //leap years over-count by 303/400 days.
+    //non leap years under-count by 2097/400 days
 
-    //after 6/(303/400) years, we need a non-leap year. = 2400/303 = 800/101
+    //7 leap years + 1 non-leap year = lose -24/400 of a day.
+    //after 16.666 sets of 8 years = 133.28 years, we lose a full day.
+    //in about 3 centuries we can add a correction, the planet speed is also not constant, so we need corrections anyway.
 
     //8 years has 366*7 + 360 days = 2922 days
 
@@ -50,8 +53,6 @@
 
     var seximal_date = document.createElement("p");
     div.appendChild(seximal_date);
-
-
     
     var sex_date_label = document.createElement("span");
     sex_date_label.innerHTML = "seximal date";
@@ -71,22 +72,6 @@
     var decimal_date = document.createElement("p");
     div.appendChild(decimal_date);
     
-
-    
-    /*
-    var test = document.createElement("input");
-    test.type = "button";
-    test.value = "test";
-    test.onclick = test_fun;
-    div.appendChild(test);
-    div.appendChild(document.createElement("br"));
-    */
-
-    function test_fun(){
-        var d = days2date(1000);
-        console.log(d);
-    };
-
     function seximal2dec_fun(){
         var s = sex_date_text.value.trim();
         var year = s.match(/^\d*\./)[0].slice(0, -1);
@@ -103,7 +88,6 @@
         var millis_since = days*24*60*60*1000;
         var start = new Date(2020, 11, 21);
         start.setTime(start.getTime() + millis_since);
-        console.log(start.toUTCString());
         decimal_date.innerHTML = start.toUTCString().slice(0, 16);
     };
     
@@ -113,8 +97,6 @@
         var year = parseInt(dec_year_text.value, 10);
         var d = days_since(day, month, year);
         var date = days2date(d);
-        console.log([day, month, year, d]);
-        console.log(date);
         var sex_day = date[0];
         var sex_month = date[1];
         var sex_year = date[2];
