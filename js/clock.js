@@ -114,7 +114,8 @@ var clock = (function(){
                 spans_string
                 .concat(".000");
         };
-        var time = spans_string.toString(6)
+        spans_string = spans_string.concat("000");
+        var time = spans_string
             .match(/[^.]*\.\d?\d?\d?/)[0];
         return(time);
     };
