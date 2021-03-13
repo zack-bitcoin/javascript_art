@@ -54,15 +54,34 @@
         var seximal = m.toString(6);
 
         var words = to_words(seximal, function(m){
-            return(place_value_words[m]);
+            return(seximal_data.place_value_words[m]);
         }, -12, 12);
         places = words[1];
-        m = m / Math.pow(6, places);
+        var m2 = m / Math.pow(6, places);
         words = words[0];
-        num_result.innerHTML = four_digits(m)
+        var words2 = to_nifty_words(
+            seximal,
+            seximal_data.nifty_words);
+        var words3 = m.toString(36)
+            .toUpperCase();
+        var words4 = m.toString(6);
+            //to_nifty_words(
+            //seximal,
+            //seximal_data.nifty_symbols);
+        //var words4 = to_nifty_words(
+        //    seximal,
+        //    seximal_data.nifty_sixes);
+        num_result.innerHTML = "rounded: "
+            .concat(four_digits(m2))
             .concat(" ")
-            .concat(words);
-
+            .concat(words)
+            .concat("<br> seximal: ")
+            .concat(words4)
+            .concat("<br> nifty: ")
+            .concat(words3)
+            .concat("<br> pronounciation of nifty: ")
+            .concat(words2)
+        ;
     };
 
     function convertToSeximal(){
@@ -72,7 +91,9 @@
         var seximal = meters.toString(6);
 
         var words = to_words(seximal, function(m){
-            return(place_preffixes[m].concat("meters"));
+            return(seximal_data
+                   .place_prefixes[m]
+                   .concat("meters"));
         }, -12, 2);
         places = words[1];
         meters = meters / Math.pow(6, places);
@@ -81,50 +102,42 @@
             .concat(" ")
             .concat(words);
     };
-
-    var place_value_roots = [
-        "unexian",
-        "biexian",
-        "triexian",
-        "quadexian",
-        "pentexian",
-        "unnilexian",
-        "ununexian",
-        "umbiexian",
-        "untriexian",
-        "unquadexian",
-        "unquadexian",
-        "umpentexian",
-        "binilexian"
-    ];
-    var place_value_words = {};
-    for(var i = 0; i<place_value_roots.length; i++){
-        place_value_words[i+1] =
-            place_value_roots[i];
-        place_value_words[-i-1] =
-            place_value_roots[i].concat("ths");
-        place_value_words[0] = "";
+    function digits_to_point(s) {
+        if(s.length === 0) {
+            return(0);
+        } else if(s[0] === ".") {
+            return(0);
+        } else {
+            return 1 + digits_to_point(s.slice(1));
+        };
     };
-
-
-    var place_preffixes = {
-        2:"great-grand",
-        1:"grand",
-        0:"",
-        "-1":"unti",
-        "-2":"biti",
-        "-3":"triti",
-        "-4":"quadi",
-        "-5":"penti",
-        "-6":"unnilti",
-        "-7":"ununti",
-        "-8":"umbiti",
-        "-9":"untriti",
-        "-10":"unquadi",
-        "-11":"umpenti",
-        "-12":"binilti"
+    function to_nifty_words(seximal, wordlist) {
+        var d = digits_to_point(seximal);
+        if((d%2) === 1) {
+            seximal = "0".concat(seximal);
+        };
+        return(to_nifty_words2(seximal, wordlist));
     };
-
+    function to_nifty_words2(s, wordlist) {
+        if(s === "") {
+            return("");
+        } if (s === ".") {
+            return("");
+        } if (s[0] === ".") {
+            return(". ".concat(
+                to_nifty_words2(s.slice(1), wordlist)));
+        } if (s.length === 1) {
+            var x = parseInt(s, 6);
+            x = x * 6;
+            return(wordlist[x]);
+        } else {
+            var x = parseInt(s.slice(0, 2), 6);
+            return(wordlist[x]
+                   .concat("")
+                   .concat(to_nifty_words2(s.slice(2), wordlist)));
+        };
+    };
+    
     function to_words(s, f, lower, upper){
         if(s.match(/^0\./)){
             s = s.slice(1);
@@ -146,7 +159,7 @@
             m = lower;
         };
         var units = f(m);
-        //var units = place_preffixes[m].concat("meters");
+        //var units = place_prefixes[m].concat("meters");
         return([units, m*4]);
 
     };
