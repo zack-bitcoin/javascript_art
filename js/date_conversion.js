@@ -19,13 +19,15 @@
     var div = document.createElement("div");
     document.body.appendChild(div);
 
+    var defaults = new Date();
 
     var dec_day_label = document.createElement("span");
     dec_day_label.innerHTML = "decimal day";
     div.appendChild(dec_day_label);
     var select_dec_day = document.createElement("select");
     add_options(select_dec_day, 1, 32);
-    select_dec_day.value = 20;
+    //select_dec_day.value = 20;
+    select_dec_day.value = defaults.getDate();
     div.appendChild(select_dec_day);
 
     div.appendChild(document.createElement("br"));
@@ -34,7 +36,8 @@
     div.appendChild(dec_month_label);
     var select_dec_month = document.createElement("select");
     add_options(select_dec_month, 1, 13);
-    select_dec_month.value = 12;
+    //select_dec_month.value = 12;
+    select_dec_month.value = defaults.getMonth()+1;
     div.appendChild(select_dec_month);
 
     div.appendChild(document.createElement("br"));
@@ -43,7 +46,8 @@
     div.appendChild(dec_year_label);
     var dec_year_text = document.createElement("input");
     dec_year_text.type = "text";
-    dec_year_text.value = "2020";
+    //dec_year_text.value = "2020";
+    dec_year_text.value = defaults.getFullYear();
     div.appendChild(dec_year_text);
 
     var dec2seximal = document.createElement("input");
@@ -73,6 +77,8 @@
 
     var decimal_date = document.createElement("p");
     div.appendChild(decimal_date);
+    
+    dec2seximal_fun();
     
     function seximal2dec_fun(){
         var s = sex_date_text.value.trim();

@@ -55,7 +55,7 @@
 
         var words = to_words(seximal, function(m){
             return(place_value_words[m]);
-        }, -13, 13);
+        }, -12, 12);
         places = words[1];
         m = m / Math.pow(6, places);
         words = words[0];
@@ -73,7 +73,7 @@
 
         var words = to_words(seximal, function(m){
             return(place_preffixes[m].concat("meters"));
-        }, -13, 3);
+        }, -12, 2);
         places = words[1];
         meters = meters / Math.pow(6, places);
         words = words[0];
@@ -83,7 +83,6 @@
     };
 
     var place_value_roots = [
-        "nif",
         "unexian",
         "biexian",
         "triexian",
@@ -103,29 +102,27 @@
         place_value_words[i+1] =
             place_value_roots[i];
         place_value_words[-i-1] =
-            place_value_roots[i].concat("th");
+            place_value_roots[i].concat("ths");
         place_value_words[0] = "";
     };
 
 
     var place_preffixes = {
-        3:"great-grand",
-        2:"grand",
-        1:"feta",
+        2:"great-grand",
+        1:"grand",
         0:"",
-        "-1":"nifti",
-        "-2":"unti",
-        "-3":"biti",
-        "-4":"triti",
-        "-5":"quadi",
-        "-6":"penti",
-        "-7":"unnilti",
-        "-8":"ununti",
-        "-9":"umbiti",
-        "-10":"untriti",
-        "-11":"unquadi",
-        "-12":"umpenti",
-        "-13":"binilti"
+        "-1":"unti",
+        "-2":"biti",
+        "-3":"triti",
+        "-4":"quadi",
+        "-5":"penti",
+        "-6":"unnilti",
+        "-7":"ununti",
+        "-8":"umbiti",
+        "-9":"untriti",
+        "-10":"unquadi",
+        "-11":"umpenti",
+        "-12":"binilti"
     };
 
     function to_words(s, f, lower, upper){
@@ -141,7 +138,7 @@
             n = place_value(s, 0);
         };
         n = n - 1;
-        var m = Math.floor(n/2);
+        var m = Math.floor(n/4);
         if(m > upper) {
             m = upper;
         };
@@ -150,7 +147,7 @@
         };
         var units = f(m);
         //var units = place_preffixes[m].concat("meters");
-        return([units, m*2]);
+        return([units, m*4]);
 
     };
     function place_value_below_one(s, n){
