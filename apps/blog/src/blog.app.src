@@ -8,7 +8,8 @@
     stdlib,
     ssl,
     cowboy,
-    inets
+    inets,
+    compiler
    ]},
   {env,[]},
   {modules, []},
